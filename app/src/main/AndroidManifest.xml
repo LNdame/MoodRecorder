@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="cct.ansteph.moodrecorder">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".view.welcome.Splash"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".view.welcome.Registration"
+            android:label="@string/title_activity_day"
+            android:parentActivityName=".view.welcome.Splash"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="cct.ansteph.moodrecorder.view.welcome.Splash" />
+        </activity>
+
+
+        <provider
+            android:name=".contentprovider.EmojiContentProvider"
+            android:authorities="cct.ansteph.moodrecorder.contentprovider.emojicontentprovider"
+            android:enabled="true"
+            android:exported="false" />
+        <provider
+            android:name=".contentprovider.DiaryUserContentProvider"
+            android:authorities="cct.ansteph.moodrecorder.contentprovider.diaryusercontentprovider"
+            android:enabled="true"
+            android:exported="false" />
+        <provider
+            android:name=".contentprovider.EntryContentProvider"
+            android:authorities="cct.ansteph.moodrecorder.contentprovider.entrycontentprovider"
+            android:enabled="true"
+            android:exported="false" />
+        <provider
+            android:name=".contentprovider.RecordedActivityContentProvider"
+            android:authorities="cct.ansteph.moodrecorder.contentprovider.recordedactivitycontentprovider"
+            android:enabled="true"
+            android:exported="false" />
+        <provider
+            android:name=".contentprovider.ActivityContentProvider"
+            android:authorities="cct.ansteph.moodrecorder.contentprovider.activitycontentprovider"
+            android:enabled="true"
+            android:exported="false" />
+
+        <activity
+            android:name=".view.record.RecordMood"
+            android:label="@string/title_activity_record_mood"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".view.record.RecordActivity"
+            android:label="@string/title_activity_record"
+            android:parentActivityName=".view.record.RecordMood"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="cct.ansteph.moodrecorder.view.record.RecordMood" />
+        </activity>
+        <activity
+            android:name=".view.record.Entries"
+            android:label="@string/title_activity_entries"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".view.stats.Statistics"
+            android:label="@string/title_activity_statistics"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".view.stats.CalendarView"
+            android:label="@string/title_activity_calendar_view"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".view.export.ExportData"
+            android:label="@string/title_activity_export_data"
+            android:parentActivityName=".view.stats.Statistics"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="cct.ansteph.moodrecorder.view.stats.Statistics" />
+        </activity>
+        <activity
+            android:name=".view.export.About"
+            android:label="@string/title_activity_about"
+            android:parentActivityName=".view.record.RecordMood"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="cct.ansteph.moodrecorder.view.record.RecordMood" />
+        </activity>
+    </application>
+
+</manifest>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_record_mood"
+            android:icon="@drawable/ic_mood_black_24dp"
+            android:title="Record Mood" />
+        <item
+            android:id="@+id/nav_record_activity"
+            android:icon="@drawable/ic_activity_black_24dp"
+            android:title="Record Activity" />
+
+        <item
+            android:id="@+id/nav_entry"
+            android:icon="@drawable/ic_entry_black_24dp"
+            android:title="Entries" />
+        <item
+            android:id="@+id/nav_statistic"
+            android:icon="@drawable/ic_multiline_chart_black_24dp"
+            android:title="Statistic" />
+        <item
+            android:id="@+id/nav_calendar"
+            android:icon="@drawable/ic_calendar_black_24dp"
+            android:title="Calendar" />
+    </group>
+
+    <item android:title="Extras">
+        <menu>
+            <item
+                android:id="@+id/nav_export"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Export" />
+            <item
+                android:id="@+id/nav_about"
+                android:icon="@drawable/ic_about_black_24dp"
+                android:title="About" />
+        </menu>
+    </item>
+
+
+</menu>

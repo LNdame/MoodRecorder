@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="cct.ansteph.moodrecorder.view.stats.CalendarView"
+    tools:showIn="@layout/app_bar_calendar_view">
+
+    <com.darwindeveloper.onecalendar.views.OneCalendarView
+        android:id="@+id/oneCalendar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:backgroundColorDaysOfAnotherMonth="@color/colorPrimary"
+        app:backgroundColorDaysOfMonth="#53c0c0c1"
+        app:backgroundColorSelectedDay="#d2d2d2"
+        app:calendarBackgroundColor="@color/colorPrimary"
+        app:calendarLanguage="EN"
+        app:currentDayBackgroundColor="#fad501"
+        app:mainBackgroundColor="@color/colorPrimary"
+        app:textColorDaysOfAnotherMonth="#fff"
+        app:textColorDaysOfMonth="#fff"
+        app:textColorMonthAndYear="@color/colorPrimary"
+        app:textColorSelectedDay="#000000"
+        />
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="vertical"
+        android:elevation="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="40dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Hall of Fame"
+            android:textColor="@color/textColorPrimary"
+            android:textSize="@dimen/subheading"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!--  first layout -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/button4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:drawableTop="@mipmap/ic_mood_powerful"
+                android:text="0" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/button3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:drawableTop="@mipmap/ic_mood_happy_artist"
+                android:text="0" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/button2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:drawableTop="@mipmap/ic_mood_excited"
+                android:text="0" />
+
+
+        </LinearLayout>
+
+        <!--  second layout -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/button8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:drawableTop="@mipmap/ic_mood_tired"
+                android:text="0" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/button7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:drawableTop="@mipmap/ic_mood_lonely"
+                android:text="0" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/button6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:drawableTop="@mipmap/ic_mood_numb"
+                android:text="0" />
+
+
+        </LinearLayout>
+
+        <!--  third layout -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/button12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:drawableTop="@mipmap/ic_mood_irritable"
+                android:text="0" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/button11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+
+                android:drawableTop="@mipmap/ic_mood_sadness"
+                android:text="0" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/button10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:drawableTop="@mipmap/ic_mood_frustated"
+                android:text="0" />
+
+
+        </LinearLayout>
+
+        <!--  fourth layout -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:drawableTop="@mipmap/ic_mood_worried"
+                android:text="0" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/button9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:drawableTop="@mipmap/ic_mood_fearfull"
+                android:text="0" />
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/button5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:drawableTop="@mipmap/ic_mood_angry"
+                android:text="0" />
+        </LinearLayout>
+
+    </LinearLayout>
+    </ScrollView>
+</LinearLayout>
