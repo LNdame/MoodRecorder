@@ -12,7 +12,7 @@ public class Entry {
 
     Emoji emoji;
 
-    String mood, recordTime, recordDate;
+    String mood, recordTime, recordDate, addedNote;
 
     DiaryUser diaryUser;
 
@@ -101,5 +101,13 @@ public class Entry {
 
     public void setActivityList(ArrayList<Activity> activityList) {
         this.activityList = activityList;
+    }
+
+    public String getAddedNote() {
+        return addedNote;
+    }
+
+    public void setAddedNote(String addedNote) {
+        this.addedNote = addedNote;
     }
 }

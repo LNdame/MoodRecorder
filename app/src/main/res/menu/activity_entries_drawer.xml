@@ -7,6 +7,7 @@
             android:icon="@drawable/ic_mood_black_24dp"
             android:title="Record Mood" />
         <item
+            android:visible="false"
             android:id="@+id/nav_record_activity"
             android:icon="@drawable/ic_activity_black_24dp"
             android:title="Record Activity" />
@@ -18,7 +19,7 @@
         <item
             android:id="@+id/nav_statistic"
             android:icon="@drawable/ic_multiline_chart_black_24dp"
-            android:title="Statistic" />
+            android:title="Statistics" />
         <item
             android:id="@+id/nav_calendar"
             android:icon="@drawable/ic_calendar_black_24dp"

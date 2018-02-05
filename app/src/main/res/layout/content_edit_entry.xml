@@ -1,0 +1,419 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/activity_horizontal_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="cct.ansteph.moodrecorder.view.record.EditEntry"
+    tools:showIn="@layout/activity_edit_entry">
+
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/txtGreetings"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="Just making a correction"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="@dimen/headline"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+<!--  date time layout -->
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="30dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp">
+
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="?android:listPreferredItemHeight"
+            android:layout_marginTop="5dp"
+            android:layout_weight="1"
+            android:text="Sat, 11 March"
+            android:clickable="true"
+            android:onClick="onStartDateClicked"
+            android:gravity="center"
+            android:layout_below="@+id/textphase"
+            android:drawableLeft="@drawable/ic_date_range_black_24dp"
+            android:drawableRight="@drawable/ic_arrow_down_black_24dp"
+            android:paddingRight="16dp"
+            android:id="@+id/txtstartdateday" />
+
+
+
+        <TextView
+            android:paddingLeft="16dp"
+            android:layout_width="0dp"
+            android:layout_height="?android:listPreferredItemHeight"
+            android:layout_weight="1"
+            android:text="16:00"
+            android:clickable="true"
+            android:onClick="onStartTimeClicked"
+            android:gravity="center"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_below="@+id/textphase"
+            android:drawableLeft="@drawable/ic_access_time_black_24dp"
+            android:drawableRight="@drawable/ic_arrow_down_black_24dp"
+            android:id="@+id/txtstartdatetime" />
+
+
+    </LinearLayout>
+
+    <TextView
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:text="How I felt"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="@dimen/title"
+         />
+    <!--  first row layout -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/btnpowerful"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="getEmojiClicked"
+                android:drawableTop="@mipmap/ic_mood_powerful"
+                android:text="powerful" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/btnhappy"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="getEmojiClicked"
+                android:drawableTop="@mipmap/ic_mood_happy_artist"
+                android:text="happy" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/btnexcited"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="getEmojiClicked"
+                android:drawableTop="@mipmap/ic_mood_excited"
+                android:text="excited" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/btntired"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="getEmojiClicked"
+                android:drawableTop="@mipmap/ic_mood_tired"
+                android:text="tired" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/btnlonely"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="getEmojiClicked"
+                android:drawableTop="@mipmap/ic_mood_lonely"
+                android:text="lonely" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/btnnumb"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="getEmojiClicked"
+                android:drawableTop="@mipmap/ic_mood_numb"
+                android:text="numb" />
+
+
+
+        </LinearLayout>
+
+
+    </HorizontalScrollView>
+
+
+    <!--  second  row layout -->
+
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/btnirritable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="getEmojiClicked"
+                android:drawableTop="@mipmap/ic_mood_irritable"
+                android:text="irritable" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/btnsad"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="getEmojiClicked"
+                android:drawableTop="@mipmap/ic_mood_sadness"
+                android:text="sad" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/btnfrustrated"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="getEmojiClicked"
+                android:drawableTop="@mipmap/ic_mood_frustated"
+                android:text="frustrated" />
+
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/btnworried"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="getEmojiClicked"
+                android:drawableTop="@mipmap/ic_mood_worried"
+                android:text="worried" />
+
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/btnfearful"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="getEmojiClicked"
+                android:drawableTop="@mipmap/ic_mood_fearfull"
+                android:text="fearful" />
+            <Button
+                style="@style/emoji_button"
+                android:id="@+id/btnangry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@null"
+                android:onClick="getEmojiClicked"
+                android:drawableTop="@mipmap/ic_mood_angry"
+                android:text="angry" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+
+   <!-- ********************** the Activities ******************** -->
+    <TextView
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:text="What I did"
+        android:textColor="@color/textColorPrimary"
+        android:textSize="@dimen/title"
+        />
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
+
+            <Button
+                style="@style/daily_activity_button"
+                android:id="@+id/btnActiWork"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:drawableTop="@mipmap/ic_acti_work"
+                android:layout_weight="1"
+
+
+                android:onClick="getActivitiesClicked"
+                android:text="work" />
+
+            <Button
+                style="@style/daily_activity_button"
+                android:id="@+id/btnActiRelax"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:drawableTop="@mipmap/ic_acti_relax"
+                android:layout_weight="1"
+                android:onClick="getActivitiesClicked"
+                android:text="relax" />
+
+            <Button
+                style="@style/daily_activity_button"
+                android:id="@+id/btnActiFriends"
+                android:layout_weight="1"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:onClick="getActivitiesClicked"
+                android:drawableTop="@mipmap/ic_acti_friend"
+                android:padding="8dp"
+                android:text="friends" />
+
+
+
+            <Button
+                style="@style/daily_activity_button"
+                android:id="@+id/btnActiDate"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:onClick="getActivitiesClicked"
+                android:drawableTop="@mipmap/ic_acti_date"
+                android:layout_weight="1"
+                android:text="date"
+
+                />
+
+
+            <Button
+                style="@style/daily_activity_button"
+                android:id="@+id/btnActiSport"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:onClick="getActivitiesClicked"
+                android:drawableTop="@mipmap/ic_acti_sport"
+                android:layout_weight="1"
+                android:text="sport" />
+
+            <Button
+                style="@style/daily_activity_button"
+                android:id="@+id/btnActiParty"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:onClick="getActivitiesClicked"
+                android:drawableTop="@mipmap/ic_acti_party"
+                android:layout_weight="1"
+                android:text="party" />
+
+            <Button
+                style="@style/daily_activity_button"
+                android:id="@+id/btnActiMovies"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:onClick="getActivitiesClicked"
+                android:drawableTop="@mipmap/ic_acti_movies"
+                android:layout_weight="1"
+                android:text="movies" />
+
+            <Button
+                style="@style/daily_activity_button"
+                android:id="@+id/btnActiReading"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:onClick="getActivitiesClicked"
+                android:drawableTop="@mipmap/ic_acti_reading"
+                android:layout_weight="1"
+                android:text="reading" />
+
+            <Button
+                style="@style/daily_activity_button"
+                android:id="@+id/btnActiShopping"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:onClick="getActivitiesClicked"
+                android:drawableTop="@mipmap/ic_acti_shopping"
+                android:layout_weight="1"
+                android:text="shopping" />
+
+            <Button
+                style="@style/daily_activity_button"
+                android:id="@+id/btnActiTravel"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:onClick="getActivitiesClicked"
+                android:drawableTop="@mipmap/ic_acti_travel"
+                android:layout_weight="1"
+                android:text="travel" />
+
+            <Button
+                style="@style/daily_activity_button"
+                android:id="@+id/btnActiFood"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:onClick="getActivitiesClicked"
+                android:drawableTop="@mipmap/ic_acti_food"
+                android:layout_weight="1"
+                android:text="food" />
+
+            <Button
+                style="@style/daily_activity_button"
+                android:id="@+id/btnActiCleaning"
+                android:layout_width="60dp"
+                android:layout_height="80dp"
+                android:onClick="getActivitiesClicked"
+                android:drawableTop="@mipmap/ic_acti_cleaning"
+                android:layout_weight="1"
+                android:text="cleaning" />
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+
+
+
+</LinearLayout>
+
+
+</android.support.v4.widget.NestedScrollView>

@@ -19,6 +19,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import cct.ansteph.moodrecorder.R;
 import cct.ansteph.moodrecorder.api.ContentTypes;
 import cct.ansteph.moodrecorder.api.columns.ActivityColumns;
+import cct.ansteph.moodrecorder.api.columns.EntryColumns;
 import cct.ansteph.moodrecorder.api.columns.RecordedActivtyColumns;
 import cct.ansteph.moodrecorder.app.ActivityName;
 import cct.ansteph.moodrecorder.model.Activity;
@@ -40,6 +43,8 @@ public class RecordActivity extends AppCompatActivity
 
     int mSentEntry_Id;
     ArrayList<Activity> mClickedActivies;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,8 +61,11 @@ public class RecordActivity extends AppCompatActivity
 
                     try{
                         recordActivity(mClickedActivies);
+                        String addedNote = ((EditText)findViewById(R.id.edtAddedNote) ).getText().toString();
+                        recordAddedNote(addedNote);
                         Snackbar.make(view, "Recorded", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
+                        startActivity(new Intent(getApplicationContext(),Entries.class));
                     }catch (SQLException e)
                     {
                         e.printStackTrace();
@@ -121,6 +129,8 @@ public class RecordActivity extends AppCompatActivity
 
         return activities;
     }
+
+
 
 
 
@@ -230,6 +240,26 @@ public class RecordActivity extends AppCompatActivity
 
     }
 
+
+
+    public void recordAddedNote(String note){
+        String entry_id = String.valueOf( mSentEntry_Id);
+
+        try{
+            ContentValues values = new ContentValues();
+            values.put(EntryColumns.ADDED_NOTE, note );
+
+            getContentResolver().update(ContentTypes.ENTRY_CONTENT_URI,values, EntryColumns._ID+" =?", new String[]{entry_id});
+
+
+        }catch (SQLException se)
+        {
+            se.printStackTrace();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
 
 
     public void changeButtonBackground(View view)

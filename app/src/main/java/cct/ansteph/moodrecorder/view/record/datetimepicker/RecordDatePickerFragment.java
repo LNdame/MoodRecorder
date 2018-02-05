@@ -35,6 +35,11 @@ public class RecordDatePickerFragment extends DialogFragment implements DatePick
     public void onDateSet(DatePicker datePicker, int year, int month, int dayOfMonth) {
 
         TextView txtStartDate = (TextView) getActivity().findViewById(R.id.txtstartdateday);
-        txtStartDate.setText(String.valueOf(year) +"-"+ String.valueOf(month+1) +"-"+  String.valueOf(dayOfMonth));
+
+
+        String monthcon = (month<10)? "0"+String.valueOf(month+1):String.valueOf(month+1);
+        String daycon =  (dayOfMonth<10)? "0"+String.valueOf(dayOfMonth):String.valueOf(dayOfMonth);
+
+        txtStartDate.setText(String.valueOf(year) +"-"+ monthcon +"-"+  daycon);
     }
 }

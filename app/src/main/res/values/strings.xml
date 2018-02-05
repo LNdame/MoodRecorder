@@ -15,6 +15,34 @@
 
 
     <string name="error_field_required">This field is required</string>
-    <string name="greeting"> Hello %1$s!\n How are you ?</string>
+    <string name="greeting"> Hello %1$s, how are you ?</string>
+    <string name="title_activity_edit_entry">Edit Entry</string>
 
+    <string name="dev"> This is developed and maintained by the Centre for Community technologies (http://cct.mandela.ac.za/) at the Nelson Mandela University in South Africa.</string>
+
+    <string name="safmh">The SA Federation for Mental Health is the largest national mental
+health organisation in South Africa. The strategic key focus areas of
+the SAFMH National Office are:\n
+
+The implementation of national awareness campaigns, Empowerment of mental health care users and mental health organisations nationwide, Advocating for the human rights of mental health care users and Mental health research and information management\n
+
+
+The National Office engages with government and other key
+stakeholders in the mental health sector – nationally and
+internationally – with the aim of creating a society in which mental
+health and the wellbeing of mental health care users receive the
+attention they deserve.\n\n
+
+
+The SAFMH Board is constituted by 17 Mental Health Societies from
+across South Africa and the SA Mental Health Advocacy Movement. In
+addition, the organisation has about 100 member organisations from all
+nine provinces that are actively involved in the mental health sector.
+The Mental Health Societies and member organisations are all independent
+ bodies with their own governing structures. These organisations provide
+ community-based mental health services to communities that are often
+vulnerable and under-resourced. The SAFMH National Office aims to
+provide support to these organisations from a strategic national
+perspective and to a certain extent streamline mental health services in
+ South Africa.</string>
 </resources>

@@ -110,7 +110,8 @@ public class Entries extends AppCompatActivity
     {
         ContentResolver resolver = getContentResolver();
 
-        Cursor  cursor = resolver.query(ContentTypes.ENTRY_CONTENT_URI, EntryColumns.PROJECTION, null, null,null);
+        Cursor  cursor = resolver.query(ContentTypes.ENTRY_CONTENT_URI, EntryColumns.PROJECTION,
+                null, null,null);
         ArrayList<Entry> entries = new ArrayList<>();
 
         if(cursor.moveToFirst()){

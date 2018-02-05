@@ -29,7 +29,6 @@
                 android:value="cct.ansteph.moodrecorder.view.welcome.Splash" />
         </activity>
 
-
         <provider
             android:name=".contentprovider.EmojiContentProvider"
             android:authorities="cct.ansteph.moodrecorder.contentprovider.emojicontentprovider"
@@ -98,6 +97,15 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="cct.ansteph.moodrecorder.view.record.RecordMood" />
+        </activity>
+        <activity
+            android:name=".view.record.EditEntry"
+            android:label="@string/title_activity_edit_entry"
+            android:parentActivityName=".view.record.Entries"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="cct.ansteph.moodrecorder.view.record.Entries" />
         </activity>
     </application>
 

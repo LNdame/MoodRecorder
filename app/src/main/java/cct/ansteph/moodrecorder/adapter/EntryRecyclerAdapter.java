@@ -1,12 +1,14 @@
 package cct.ansteph.moodrecorder.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,6 +20,8 @@ import cct.ansteph.moodrecorder.customview.DailyActivity;
 import cct.ansteph.moodrecorder.model.Activity;
 import cct.ansteph.moodrecorder.model.Entry;
 import cct.ansteph.moodrecorder.utils.BitmapTransfomUtils;
+import cct.ansteph.moodrecorder.utils.DateTimeUtils;
+import cct.ansteph.moodrecorder.view.record.EditEntry;
 
 /**
  * Created by loicstephan on 2018/01/24.
@@ -45,7 +49,10 @@ public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdap
     public void onBindViewHolder(EntryViewHolder holder, int position) {
 
         holder.txtEntryTime.setText(entries.get(position).getRecordTime());
-        holder.txtEntryDate.setText(entries.get(position).getRecordDate());
+
+        String entryDate = DateTimeUtils.parseDateTime(entries.get(position).getRecordDate(),DateTimeUtils.LONGDATEDASH,DateTimeUtils.SHORTWEEKDATEFORMAT);
+
+        holder.txtEntryDate.setText(entryDate);
         holder.txtEntryMood.setText(entries.get(position).getEmoji().getMoodName());
 
         // TODO: 2018/01/25  uncomment when the emoji object is added to the list
@@ -66,6 +73,12 @@ public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdap
        }
 
 
+       holder.imgbtnEdit.setOnClickListener(new View.OnClickListener() {
+           @Override
+           public void onClick(View v) {
+               mContext.startActivity(new Intent(mContext, EditEntry.class));
+           }
+       });
 
         final View itemview = holder.itemView;
 
@@ -86,6 +99,7 @@ public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdap
         public final TextView txtEntryDate;
         public final TextView txtEntryTime;
         public final TextView txtEntryMood;
+        public final ImageButton imgbtnEdit;
         public final LinearLayout lytDailyActi;
        // public final TextView txtPromoEnd;
 
@@ -97,6 +111,7 @@ public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdap
 
             this.txtEntryTime = (TextView)itemView.findViewById(R.id.txtentry_time) ;
             this.txtEntryMood = (TextView)itemView.findViewById(R.id.txtentry_mood) ;
+            this.imgbtnEdit = (ImageButton) itemView.findViewById(R.id.imgBtnEdit);
              this.lytDailyActi = (LinearLayout) itemView.findViewById(R.id.lytDailyActivity) ;
 
         }
