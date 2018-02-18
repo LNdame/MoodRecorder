@@ -1,10 +1,12 @@
 package cct.ansteph.moodrecorder.model;
 
+import java.io.Serializable;
+
 /**
  * Created by loicstephan on 2018/01/20.
  */
 
-public class Emoji {
+public class Emoji implements Serializable {
 
     int id;
     String moodName;

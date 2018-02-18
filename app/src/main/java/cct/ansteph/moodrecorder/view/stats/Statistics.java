@@ -1,12 +1,21 @@
 package cct.ansteph.moodrecorder.view.stats;
 
+import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -16,6 +25,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.animation.Easing;
 import com.github.mikephil.charting.charts.BarChart;
@@ -36,24 +46,57 @@ import com.github.mikephil.charting.formatter.IAxisValueFormatter;
 import com.github.mikephil.charting.interfaces.datasets.IBarDataSet;
 import com.github.mikephil.charting.interfaces.datasets.IRadarDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 import cct.ansteph.moodrecorder.R;
+import cct.ansteph.moodrecorder.api.ContentTypes;
+import cct.ansteph.moodrecorder.api.columns.DiaryUserColumns;
+import cct.ansteph.moodrecorder.customview.PdfCustFooter;
 import cct.ansteph.moodrecorder.customview.RadarMarkerView;
+import cct.ansteph.moodrecorder.model.DiaryUser;
 import cct.ansteph.moodrecorder.model.Entry;
 import cct.ansteph.moodrecorder.view.export.About;
+import cct.ansteph.moodrecorder.view.export.ExportData;
 import cct.ansteph.moodrecorder.view.record.RecordActivity;
 import cct.ansteph.moodrecorder.view.record.RecordMood;
 
 public class Statistics extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+    private static  String TAG  = Statistics.class.getSimpleName();
 
     private RadarChart mActiMonthRadarChart,mActiAllRadarChart;
     protected BarChart mMoodMonthChart,mMoodAllChart ;
     protected Typeface mTfRegular;
     protected Typeface mTfLight;
+
+    DiaryUser dUser;
+
+    final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
+
+    String mPDFFilePath;
+    public static final String KEY_FILE_PATH = "filepath";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,10 +104,13 @@ public class Statistics extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        requestPermission();
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                viewPreview();
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -91,7 +137,39 @@ public class Statistics extends AppCompatActivity
         generateAllRadarChart();
         generateAllBarChart();
 
+        dUser = retrieveDiaryUser();
+
     }
+
+
+
+    private DiaryUser retrieveDiaryUser (){
+        ContentResolver resolver = getContentResolver();
+
+        Cursor cursor = resolver.query(ContentTypes.DIARYUSER_CONTENT_URI, DiaryUserColumns.PROJECTION,null,null,null);
+        DiaryUser user = new DiaryUser ();
+
+        if(cursor.moveToFirst()){
+            do{
+
+                user.setId(((cursor.getString(0))!=null ? Integer.parseInt(cursor.getString(0)):0) );
+                user.setFirstname( (cursor.getString(cursor.getColumnIndex(DiaryUserColumns.FIRSTNAME)))  );
+                user.setSurname( (cursor.getString(cursor.getColumnIndex(DiaryUserColumns.SURNAME))) );
+                // user.setAge( (cursor.getString(cursor.getColumnIndex(DiaryUserColumns.AGE)))  );
+                user.setMotive( (cursor.getString(cursor.getColumnIndex(DiaryUserColumns.MOTIVE))) );
+
+            }while (cursor.moveToNext());
+
+        }
+
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+
+
+        return user;
+    }
+
 
 
     /***************************************-----------bar chart-------------------------*****************/
@@ -171,7 +249,7 @@ public class Statistics extends AppCompatActivity
      //   XYMarkerView mv = new XYMarkerView(this, xAxisFormatter);
        // mv.setChartView(mChart); // For bounds control
         //mChart.setMarker(mv); // Set the marker to the chart
-        setMonthChartData(12, 30);
+        setMonthChartData(12, 10);
 
     }
 
@@ -316,7 +394,7 @@ public class Statistics extends AppCompatActivity
         //   XYMarkerView mv = new XYMarkerView(this, xAxisFormatter);
         // mv.setChartView(mChart); // For bounds control
         //mChart.setMarker(mv); // Set the marker to the chart
-        setAllChartData(12, 30);
+        setAllChartData(12, 20);
 
     }
 
@@ -649,13 +727,7 @@ public class Statistics extends AppCompatActivity
 
 
 
-
-
     /***************************************-----------End Radar chart-------------------------*****************/
-
-
-
-
 
 
 
@@ -721,4 +793,362 @@ public class Statistics extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+    private void requestPermission()
+    {
+        if(ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED)
+        {
+            ActivityCompat.requestPermissions(this,new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_CODE_ASK_PERMISSIONS);
+        }
+    }
+
+
+    /**
+     * Listener for response to user permission request
+     *
+     * @param requestCode  Check that permission request code matches
+     * @param permissions  Permissions that requested
+     * @param grantResults Whether permissions granted
+     */
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+
+        switch (requestCode)
+        {
+            case REQUEST_CODE_ASK_PERMISSIONS:
+                if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+                    Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT)
+                            .show();
+                }else{
+                    Toast.makeText(this, "Permission Denied", Toast.LENGTH_SHORT)
+                            .show();
+                }break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+
+
+
+       /* if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+            Log.i(TAG, "Permission " +permissions[0]+ " was " +grantResults[0]);
+        }*/
+    }
+
+
+    /***************************************-----------Statistics Report-------------------------*****************/
+
+    private void viewPreview()
+    {
+        try {
+            createPDF();
+
+            Intent i = new Intent(getApplicationContext(), ExportData.class);
+            i.putExtra(KEY_FILE_PATH, mPDFFilePath);
+            startActivity(i);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public byte [] bitmaptoByte (Bitmap b)
+    {
+        // int bytes = b.getByteCount();
+        //ByteBuffer buffer = ByteBuffer.allocate(bytes);
+
+        //  b.copyPixelsToBuffer(buffer);
+        //byte[] array = buffer.array();
+
+        ByteArrayOutputStream blob = new ByteArrayOutputStream();
+        b.compress(Bitmap.CompressFormat.PNG,0,blob);
+
+
+        return  blob.toByteArray();
+    }
+
+
+    public void createPDF () throws FileNotFoundException, DocumentException
+    {
+
+
+
+        ///step 1 create the file
+        File pdfStatRepfolder = new File (Environment.getExternalStorageDirectory(), "CUMStatReport");
+
+        if(!pdfStatRepfolder.exists())   //this what should be used
+        {
+            pdfStatRepfolder.mkdir();
+            Log.i(TAG, "PDF 2 directory created");
+        }
+
+        Date date = new Date();
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(date);
+
+        File newdoc = new File(pdfStatRepfolder +File.separator+"StatReport_"+ timeStamp+".pdf");
+
+        try {
+            newdoc.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        OutputStream output = new FileOutputStream(newdoc);
+
+        Document document = new Document(PageSize.A4);
+
+        ///step 2 retrieve the document
+        PdfWriter writer= PdfWriter.getInstance(document, output);
+
+
+        PdfCustFooter reportFooter =  new PdfCustFooter();
+        reportFooter.setFooterMsg("");
+        reportFooter.setHeaderMsg("");
+        writer.setPageEvent(reportFooter);
+
+
+        ///step 3 open the document
+        document.open();
+
+        ///step 4 add content
+
+        //the fonts
+        Font fontTitle= new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
+        Font fontSubtitle= new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD);
+
+        //end of fonts
+
+
+        //******************************************User Summary header goes here *****************************/
+        BaseColor blue_grey_color = new BaseColor(207,216,220);
+
+        PdfPTable tableUserSum = new PdfPTable(5);
+
+
+        PdfPCell cellSeparator = new PdfPCell(new Phrase(" " ));
+        cellSeparator.setRowspan(2);
+        cellSeparator.setColspan(5);
+        //cellSeparator.setBackgroundColor(blue_grey_color);
+        cellSeparator.setMinimumHeight(30);
+
+        cellSeparator.setBorder(Rectangle.NO_BORDER);
+        cellSeparator.setHorizontalAlignment(Element.ALIGN_CENTER);
+       // table.addCell(cellSeparator);
+
+
+
+        PdfPCell cellRepTitle = new PdfPCell(new Phrase("Diary Statistics",fontTitle));
+        cellRepTitle.setRowspan(2);
+        cellRepTitle.setColspan(5);
+        cellRepTitle.setBackgroundColor(blue_grey_color);
+        cellRepTitle.setMinimumHeight(25);
+        cellRepTitle.setBorder(Rectangle.NO_BORDER);
+        cellRepTitle.setHorizontalAlignment(Element.ALIGN_CENTER);
+        cellRepTitle.setVerticalAlignment(Element.ALIGN_CENTER);
+        tableUserSum.addCell(cellRepTitle);
+
+
+        PdfPCell cellLeft = new PdfPCell(new Phrase("First Name: " ));
+        cellLeft.setRowspan(2);
+        cellLeft.setColspan(1);
+        cellLeft.setMinimumHeight(20);
+        cellLeft.setBackgroundColor(blue_grey_color);
+        //cellSite.setBorder(Rectangle.NO_BORDER);
+        cellLeft.setHorizontalAlignment(Element.ALIGN_LEFT);
+        tableUserSum.addCell(cellLeft);
+
+
+        PdfPCell cellRight = new PdfPCell(new Phrase(dUser.getFirstname() ));
+        cellRight.setRowspan(2);
+        cellRight.setColspan(4);
+        cellRight.setMinimumHeight(20);
+        // cellSummaryinfo.setBorder(Rectangle.NO_BORDER);
+        cellRight.setHorizontalAlignment(Element.ALIGN_CENTER);
+        tableUserSum.addCell(cellRight);
+
+
+        cellLeft.setPhrase(new Phrase("Surname: " ));
+        cellRight.setPhrase(new Phrase(dUser.getSurname() ));
+        tableUserSum.addCell(cellLeft);
+        tableUserSum.addCell(cellRight);
+
+
+        tableUserSum.addCell(cellSeparator);
+
+        //******************************************End User Summary header goes here *****************************/
+
+
+        PdfPTable tableStatChart = new PdfPTable(2);
+        tableStatChart.setWidthPercentage(100f);
+
+
+        //empty cell just to create space
+        PdfPCell smallemptycell;
+        smallemptycell = new PdfPCell(new Phrase(" "));
+        smallemptycell.setColspan(3);
+        smallemptycell.setMinimumHeight(10);
+        //cellst.setBackgroundColor(blue_grey_color);
+        smallemptycell.setBorder(Rectangle.NO_BORDER);
+        smallemptycell.setHorizontalAlignment(Element.ALIGN_CENTER);
+        //end empty cell
+
+
+        PdfPCell cellTitle;
+        cellTitle = new PdfPCell(new Phrase("Moods",fontTitle));
+        cellTitle.setColspan(3);
+        cellTitle.setMinimumHeight(25);
+        //cellst.setBackgroundColor(blue_grey_color);
+        cellTitle.setBorder(Rectangle.NO_BORDER);
+        cellTitle.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+
+        PdfPCell cellSubTitle;
+
+        cellSubTitle = new PdfPCell(new Phrase("This Month",fontSubtitle));
+        cellSubTitle.setColspan(3);
+        cellSubTitle.setMinimumHeight(25);
+        //cellst.setBackgroundColor(blue_grey_color);
+        cellSubTitle.setBorder(Rectangle.NO_BORDER);
+        cellSubTitle.setHorizontalAlignment(Element.ALIGN_CENTER);
+
+        tableStatChart.addCell(cellTitle);
+        tableStatChart.addCell(cellSubTitle);
+
+        tableStatChart .addCell(smallemptycell);
+
+        //adding the first month bar chart
+        try{
+            mMoodMonthChart.setDrawingCacheEnabled(true);
+            Bitmap b = mMoodMonthChart.getDrawingCache();
+
+            Image monthChartImg = Image.getInstance(bitmaptoByte(b));
+            monthChartImg.scalePercent(30f);
+
+            PdfPCell cellChart = new PdfPCell(monthChartImg);
+            cellChart.setColspan(2);
+            cellChart.setRowspan(2);
+
+            cellChart.setMinimumHeight(60);
+            // cellstatus.setBackgroundColor(hard_grey_color);
+            cellChart.setBorder(Rectangle.NO_BORDER);
+            cellChart.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cellChart.setVerticalAlignment(Element.ALIGN_CENTER);
+            tableStatChart.addCell(cellChart);
+
+        }catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+      //  tableStatChart .addCell(smallemptycell);
+
+        //adding the second all time bar chart
+        cellSubTitle.setPhrase(new Phrase("All time",fontSubtitle));
+        tableStatChart.addCell(cellSubTitle);
+
+
+        try{
+            mMoodAllChart.setDrawingCacheEnabled(true);
+            Bitmap b = mMoodAllChart.getDrawingCache();
+
+            Image monthChartImg = Image.getInstance(bitmaptoByte(b));
+            monthChartImg.scalePercent(30f);
+
+            PdfPCell cellChart = new PdfPCell(monthChartImg);
+            cellChart.setColspan(2);
+            cellChart.setRowspan(2);
+
+            cellChart.setMinimumHeight(60);
+            // cellstatus.setBackgroundColor(hard_grey_color);
+            cellChart.setBorder(Rectangle.NO_BORDER);
+            cellChart.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cellChart.setVerticalAlignment(Element.ALIGN_CENTER);
+            tableStatChart.addCell(cellChart);
+
+        }catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+       // tableStatChart .addCell(smallemptycell);
+
+        //adding the first month radar chart
+
+        cellTitle.setPhrase(new Phrase("Activities",fontTitle));
+        cellSubTitle.setPhrase(new Phrase("This Month",fontSubtitle));
+        tableStatChart.addCell(cellTitle);
+        tableStatChart.addCell(cellSubTitle);
+
+        try{
+            mActiMonthRadarChart.setDrawingCacheEnabled(true);
+            Bitmap b = mActiMonthRadarChart.getDrawingCache();
+
+            Image monthChartImg = Image.getInstance(bitmaptoByte(b));
+            monthChartImg.scalePercent(30f);
+
+            PdfPCell cellChart = new PdfPCell(monthChartImg);
+            cellChart.setColspan(2);
+            cellChart.setRowspan(2);
+
+            cellChart.setMinimumHeight(60);
+            // cellstatus.setBackgroundColor(hard_grey_color);
+            cellChart.setBorder(Rectangle.NO_BORDER);
+            cellChart.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cellChart.setVerticalAlignment(Element.ALIGN_CENTER);
+            tableStatChart.addCell(cellChart);
+
+        }catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        tableStatChart .addCell(smallemptycell);
+
+        /****adding the second all time radar chart*****/
+        cellSubTitle.setPhrase(new Phrase("This Month",fontSubtitle));
+        tableStatChart.addCell(cellSubTitle);
+        try{
+            mActiAllRadarChart.setDrawingCacheEnabled(true);
+            Bitmap b = mActiAllRadarChart.getDrawingCache();
+
+            Image monthChartImg = Image.getInstance(bitmaptoByte(b));
+            monthChartImg.scalePercent(30f);
+
+            PdfPCell cellChart = new PdfPCell(monthChartImg);
+            cellChart.setColspan(2);
+            cellChart.setRowspan(2);
+
+            cellChart.setMinimumHeight(60);
+            // cellstatus.setBackgroundColor(hard_grey_color);
+            cellChart.setBorder(Rectangle.NO_BORDER);
+            cellChart.setHorizontalAlignment(Element.ALIGN_CENTER);
+            cellChart.setVerticalAlignment(Element.ALIGN_CENTER);
+            tableStatChart.addCell(cellChart);
+
+        }catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+
+
+        /****adding the table to the document*****/
+        document.add( tableUserSum);
+        document.add(tableStatChart);
+
+        ///step 5 close the document
+        document.close();
+
+        ///step 6 extract the file path
+        mPDFFilePath =newdoc.getPath();
+
+    }
+
+
+
+
+
+
 }

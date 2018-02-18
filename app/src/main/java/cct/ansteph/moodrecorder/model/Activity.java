@@ -1,10 +1,12 @@
 package cct.ansteph.moodrecorder.model;
 
+import java.io.Serializable;
+
 /**
  * Created by loicstephan on 2018/01/20.
  */
 
-public class Activity {
+public class Activity implements Serializable{
 
     int id;
     String activityName, status;

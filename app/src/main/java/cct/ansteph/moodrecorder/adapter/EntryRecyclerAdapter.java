@@ -46,7 +46,7 @@ public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdap
     }
 
     @Override
-    public void onBindViewHolder(EntryViewHolder holder, int position) {
+    public void onBindViewHolder(EntryViewHolder holder,final int position) {
 
         holder.txtEntryTime.setText(entries.get(position).getRecordTime());
 
@@ -76,7 +76,12 @@ public class EntryRecyclerAdapter extends RecyclerView.Adapter<EntryRecyclerAdap
        holder.imgbtnEdit.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
-               mContext.startActivity(new Intent(mContext, EditEntry.class));
+
+               Intent i =new Intent(mContext, EditEntry.class);
+               i.putExtra("entry",entries.get(position));
+               mContext.startActivity(i);
+
+             //  mContext.startActivity(new Intent(mContext, EditEntry.class));
            }
        });
 

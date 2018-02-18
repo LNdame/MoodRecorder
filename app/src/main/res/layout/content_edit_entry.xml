@@ -106,7 +106,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:onClick="getEmojiClicked"
+                android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_powerful"
                 android:text="powerful" />
 
@@ -117,7 +117,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:onClick="getEmojiClicked"
+                android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_happy_artist"
                 android:text="happy" />
 
@@ -128,7 +128,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:onClick="getEmojiClicked"
+                android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_excited"
                 android:text="excited" />
 
@@ -139,7 +139,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:onClick="getEmojiClicked"
+                android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_tired"
                 android:text="tired" />
 
@@ -150,7 +150,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:onClick="getEmojiClicked"
+                android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_lonely"
                 android:text="lonely" />
 
@@ -161,7 +161,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:onClick="getEmojiClicked"
+                android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_numb"
                 android:text="numb" />
 
@@ -195,7 +195,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:onClick="getEmojiClicked"
+                android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_irritable"
                 android:text="irritable" />
 
@@ -206,7 +206,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:onClick="getEmojiClicked"
+                android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_sadness"
                 android:text="sad" />
 
@@ -217,7 +217,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:onClick="getEmojiClicked"
+                android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_frustated"
                 android:text="frustrated" />
 
@@ -229,7 +229,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:onClick="getEmojiClicked"
+                android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_worried"
                 android:text="worried" />
 
@@ -240,7 +240,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:onClick="getEmojiClicked"
+                android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_fearfull"
                 android:text="fearful" />
             <Button
@@ -250,7 +250,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@null"
-                android:onClick="getEmojiClicked"
+                android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_angry"
                 android:text="angry" />
 
@@ -288,7 +288,7 @@
                 android:layout_weight="1"
 
 
-                android:onClick="getActivitiesClicked"
+                android:onClick="getActivitiesClickedEdt"
                 android:text="work" />
 
             <Button
@@ -298,7 +298,7 @@
                 android:layout_height="80dp"
                 android:drawableTop="@mipmap/ic_acti_relax"
                 android:layout_weight="1"
-                android:onClick="getActivitiesClicked"
+                android:onClick="getActivitiesClickedEdt"
                 android:text="relax" />
 
             <Button
@@ -307,7 +307,7 @@
                 android:layout_weight="1"
                 android:layout_width="60dp"
                 android:layout_height="80dp"
-                android:onClick="getActivitiesClicked"
+                android:onClick="getActivitiesClickedEdt"
                 android:drawableTop="@mipmap/ic_acti_friend"
                 android:padding="8dp"
                 android:text="friends" />
@@ -319,7 +319,7 @@
                 android:id="@+id/btnActiDate"
                 android:layout_width="60dp"
                 android:layout_height="80dp"
-                android:onClick="getActivitiesClicked"
+                android:onClick="getActivitiesClickedEdt"
                 android:drawableTop="@mipmap/ic_acti_date"
                 android:layout_weight="1"
                 android:text="date"
@@ -332,7 +332,7 @@
                 android:id="@+id/btnActiSport"
                 android:layout_width="60dp"
                 android:layout_height="80dp"
-                android:onClick="getActivitiesClicked"
+                android:onClick="getActivitiesClickedEdt"
                 android:drawableTop="@mipmap/ic_acti_sport"
                 android:layout_weight="1"
                 android:text="sport" />
@@ -342,7 +342,7 @@
                 android:id="@+id/btnActiParty"
                 android:layout_width="60dp"
                 android:layout_height="80dp"
-                android:onClick="getActivitiesClicked"
+                android:onClick="getActivitiesClickedEdt"
                 android:drawableTop="@mipmap/ic_acti_party"
                 android:layout_weight="1"
                 android:text="party" />
@@ -352,7 +352,7 @@
                 android:id="@+id/btnActiMovies"
                 android:layout_width="60dp"
                 android:layout_height="80dp"
-                android:onClick="getActivitiesClicked"
+                android:onClick="getActivitiesClickedEdt"
                 android:drawableTop="@mipmap/ic_acti_movies"
                 android:layout_weight="1"
                 android:text="movies" />
@@ -362,7 +362,7 @@
                 android:id="@+id/btnActiReading"
                 android:layout_width="60dp"
                 android:layout_height="80dp"
-                android:onClick="getActivitiesClicked"
+                android:onClick="getActivitiesClickedEdt"
                 android:drawableTop="@mipmap/ic_acti_reading"
                 android:layout_weight="1"
                 android:text="reading" />
@@ -372,7 +372,7 @@
                 android:id="@+id/btnActiShopping"
                 android:layout_width="60dp"
                 android:layout_height="80dp"
-                android:onClick="getActivitiesClicked"
+                android:onClick="getActivitiesClickedEdt"
                 android:drawableTop="@mipmap/ic_acti_shopping"
                 android:layout_weight="1"
                 android:text="shopping" />
@@ -382,7 +382,7 @@
                 android:id="@+id/btnActiTravel"
                 android:layout_width="60dp"
                 android:layout_height="80dp"
-                android:onClick="getActivitiesClicked"
+                android:onClick="getActivitiesClickedEdt"
                 android:drawableTop="@mipmap/ic_acti_travel"
                 android:layout_weight="1"
                 android:text="travel" />
@@ -392,7 +392,7 @@
                 android:id="@+id/btnActiFood"
                 android:layout_width="60dp"
                 android:layout_height="80dp"
-                android:onClick="getActivitiesClicked"
+                android:onClick="getActivitiesClickedEdt"
                 android:drawableTop="@mipmap/ic_acti_food"
                 android:layout_weight="1"
                 android:text="food" />
@@ -402,7 +402,7 @@
                 android:id="@+id/btnActiCleaning"
                 android:layout_width="60dp"
                 android:layout_height="80dp"
-                android:onClick="getActivitiesClicked"
+                android:onClick="getActivitiesClickedEdt"
                 android:drawableTop="@mipmap/ic_acti_cleaning"
                 android:layout_weight="1"
                 android:text="cleaning" />

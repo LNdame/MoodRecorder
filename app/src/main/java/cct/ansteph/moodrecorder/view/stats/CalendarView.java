@@ -105,7 +105,7 @@ public class CalendarView extends AppCompatActivity
 
                 ArrayList<Entry>entryArrayList = retrieveEntries(startDate, endDate);
                 moodCountAnalysis(entryArrayList);
-                Toast.makeText(getApplicationContext(),startDate , Toast.LENGTH_LONG).show();
+               // Toast.makeText(getApplicationContext(),startDate , Toast.LENGTH_LONG).show();
             }
         });
 

@@ -93,7 +93,7 @@ public class RecordActivity extends AppCompatActivity
         Bundle bundle = getIntent().getExtras();
         if(bundle!= null){
             mSentEntry_Id = bundle.getInt("entryID");
-            Toast.makeText(this, String.valueOf(mSentEntry_Id), Toast.LENGTH_LONG).show();
+           // Toast.makeText(this, String.valueOf(mSentEntry_Id), Toast.LENGTH_LONG).show();
         }
 
         mActivityArrayList = retrieveActivities();
@@ -182,14 +182,14 @@ public class RecordActivity extends AppCompatActivity
             btnClicked.setSelected(true);
             btnClicked.setPressed(false);
            // Log.d("RecordActivity",String.valueOf(mClickedActivies.size()));
-            Toast.makeText(this, mClickedActivies.get(mClickedActivies.size()-1).getActivityName() +" added", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this, mClickedActivies.get(mClickedActivies.size()-1).getActivityName() +" added", Toast.LENGTH_SHORT).show();
         }else
         {
             try{
                 mClickedActivies.remove(activity);
                 btnClicked.setSelected(false);
                 btnClicked.setPressed(false);
-                Toast.makeText(this, activity.getActivityName() +" removed", Toast.LENGTH_SHORT).show();
+               // Toast.makeText(this, activity.getActivityName() +" removed", Toast.LENGTH_SHORT).show();
               //  Log.d("RecordActivity",String.valueOf(mClickedActivies.size()));
             }catch (Exception e){
                 e.printStackTrace();

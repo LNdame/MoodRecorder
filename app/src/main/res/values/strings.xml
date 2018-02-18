@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MoodRecorder</string>
+    <string name="app_name">Catch-ur-Mood</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_day">Activities</string>
     <string name="title_activity_calendar_view">Calendar View</string>
@@ -45,4 +45,8 @@ vulnerable and under-resourced. The SAFMH National Office aims to
 provide support to these organisations from a strategic national
 perspective and to a certain extent streamline mental health services in
  South Africa.</string>
+
+
+    <string name="toast_pick_file_error">Unable to pick file. Check status of file manager.</string>
+
 </resources>

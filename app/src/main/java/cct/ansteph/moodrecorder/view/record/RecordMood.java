@@ -36,6 +36,7 @@ import cct.ansteph.moodrecorder.app.EmojiName;
 import cct.ansteph.moodrecorder.model.DiaryUser;
 import cct.ansteph.moodrecorder.model.Emoji;
 import cct.ansteph.moodrecorder.view.export.About;
+import cct.ansteph.moodrecorder.view.export.ExportData;
 import cct.ansteph.moodrecorder.view.record.datetimepicker.RecordDatePickerFragment;
 import cct.ansteph.moodrecorder.view.record.datetimepicker.RecordTimePickerFragment;
 import cct.ansteph.moodrecorder.view.stats.CalendarView;
@@ -218,7 +219,7 @@ public class RecordMood extends AppCompatActivity
 
         }
 
-        Toast.makeText(this, clickedEmoji.getMoodName(), Toast.LENGTH_SHORT).show();
+
 
         if(recordMoodEntry(clickedEmoji) ==1){
 
@@ -348,7 +349,7 @@ public class RecordMood extends AppCompatActivity
         } else if (id == R.id.nav_calendar) {
             startActivity(new Intent(getApplicationContext(), CalendarView.class));
         } else if (id == R.id.nav_export) {
-
+            startActivity(new Intent(getApplicationContext(), ExportData.class));
         }else if (id == R.id.nav_about) {
             startActivity(new Intent(getApplicationContext(), About.class));
         }

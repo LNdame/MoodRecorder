@@ -1,12 +1,13 @@
 package cct.ansteph.moodrecorder.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by loicstephan on 2018/01/20.
  */
 
-public class Entry {
+public class Entry implements Serializable {
 
     int id;
 
