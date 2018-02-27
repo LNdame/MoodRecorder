@@ -123,7 +123,7 @@ public class Entries extends AppCompatActivity
                 entry.setEmoji(retrieveEmojiById(emojiId));
                 entry.setRecordDate(cursor.getString(cursor.getColumnIndex(EntryColumns.RECORDDATE_ID)));
                 entry.setRecordTime(cursor.getString(cursor.getColumnIndex(EntryColumns.RECORDTIME_ID)));
-
+                entry.setAddedNote(cursor.getString(cursor.getColumnIndex(EntryColumns.ADDED_NOTE)));
 
                 //retrieve the activities
                 entry.setActivityList(retrieveRecordedActivity(entry.getId()));

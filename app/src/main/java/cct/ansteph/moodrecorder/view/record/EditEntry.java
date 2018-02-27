@@ -13,6 +13,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -20,6 +22,7 @@ import cct.ansteph.moodrecorder.R;
 import cct.ansteph.moodrecorder.api.ContentTypes;
 import cct.ansteph.moodrecorder.api.columns.ActivityColumns;
 import cct.ansteph.moodrecorder.api.columns.EmojiColumns;
+import cct.ansteph.moodrecorder.api.columns.EntryColumns;
 import cct.ansteph.moodrecorder.api.columns.RecordedActivtyColumns;
 import cct.ansteph.moodrecorder.app.ActivityName;
 import cct.ansteph.moodrecorder.app.EmojiName;
@@ -37,6 +40,10 @@ public class EditEntry extends AppCompatActivity {
     ArrayList<Emoji> mEmojiArrayList;
 
     Entry mEditedEntry;
+    Emoji mEditedEmoji;
+    TextView  txtStartDate, txtStartTime;
+
+    EditText edtAddedNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,28 +52,51 @@ public class EditEntry extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
+
+
+        txtStartDate= (TextView) findViewById(R.id.txtstartdateday);
+        txtStartTime= (TextView) findViewById(R.id.txtstartdatetime);
+        edtAddedNote =(EditText) findViewById(R.id.edtAddedNote);
+
+
 
         Bundle bundle = getIntent().getExtras();
         if(bundle!=null)
         {
             mEditedEntry = (Entry)bundle.getSerializable("entry");
             mClickedActivies = mEditedEntry.getActivityList();
+            mEditedEmoji  = mEditedEntry.getEmoji();
 
+            //highlight the emoji and the activities selected
+            prepareEmoji(mEditedEmoji);
             preparedActivity(mClickedActivies);
+
+            //report the time
+            txtStartDate.setText(mEditedEntry.getRecordDate());
+            txtStartTime.setText(mEditedEntry.getRecordTime());
+            edtAddedNote.setText(mEditedEntry.getAddedNote());
+
         }else{
             mEditedEntry = new Entry();
         }
 
         mActivityArrayList = retrieveActivities();
         mEmojiArrayList = retrieveEmojis();
+
+
+
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+               int i= updateEntry(mEditedEntry.getId());
+               if(i==1)
+                   startActivity(new Intent(getApplicationContext(),Entries.class));
+
+            }
+        });
 
 
 
@@ -163,12 +193,9 @@ public class EditEntry extends AppCompatActivity {
 
 
 
-    public void recordActivity(ArrayList<Activity> clickedActivity)throws SQLException {
+    public void recordActivity(ArrayList<Activity> clickedActivity, int entryID)throws SQLException {
 
-
-        int id =0;
-
-        String entry_id = String.valueOf( id);
+        String entry_id = String.valueOf( entryID);
 
 
         for(Activity activity:clickedActivity){
@@ -176,7 +203,7 @@ public class EditEntry extends AppCompatActivity {
 
             ContentValues values = new ContentValues();
 
-            values.put(RecordedActivtyColumns.ENTRY_ID,id) ;
+            values.put(RecordedActivtyColumns.ENTRY_ID,entry_id) ;
             values.put(RecordedActivtyColumns.ACTIVITY_ID ,activity.getId()) ;
 
             getContentResolver().insert(ContentTypes.RECORDEDACTIVITY_CONTENT_URI, values);
@@ -187,6 +214,57 @@ public class EditEntry extends AppCompatActivity {
 
 
 
+    }
+
+    //TO DO:
+    //check the status of clicked activities
+    //check that deletion occurs
+
+    public void deleteActivities(int entryID)throws SQLException {
+
+        String entry_id = String.valueOf( entryID);
+
+        getContentResolver().delete(ContentTypes.RECORDEDACTIVITY_CONTENT_URI, RecordedActivtyColumns.ENTRY_ID+" =?", new String[]{entry_id});
+
+    }
+
+
+    public int updateEntry(int entryID)
+    {
+        String entry_id = String.valueOf( entryID);
+        String emoji_id =String.valueOf( mEditedEmoji.getId());
+        String recordtime = txtStartTime.getText().toString();
+        String recorddate = txtStartDate.getText().toString();
+        String note = edtAddedNote.getText().toString();
+
+
+        try{
+             deleteActivities(entryID);
+
+            recordActivity(mClickedActivies,entryID);
+
+
+            ContentValues values = new ContentValues();
+
+            values.put(EntryColumns.ADDED_NOTE, note );
+            values.put(EntryColumns.EMOJI_ID,emoji_id);
+            values.put(EntryColumns.RECORDTIME_ID ,recordtime);
+            values.put(EntryColumns.RECORDDATE_ID,recorddate) ;
+
+            getContentResolver().update(ContentTypes.ENTRY_CONTENT_URI,values, EntryColumns._ID+" =?", new String[]{entry_id});
+
+            return 1;
+
+
+        }catch (SQLException se)
+        {
+            se.printStackTrace();
+            return  0;
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+            return 0;
+        }
     }
 
 
@@ -261,9 +339,13 @@ public class EditEntry extends AppCompatActivity {
 
     public void getEmojiClickedEdt(View view)
     {
+
+        clearEmojiSelection();
         int id  = view.getId();
 
         Emoji clickedEmoji = new Emoji();
+
+        Button btnClicked = (Button) view;
 
         switch (id)
         {
@@ -282,6 +364,12 @@ public class EditEntry extends AppCompatActivity {
 
         }
 
+        //Update the edited emoji with the newly selected one even if it is the same
+        mEditedEmoji = clickedEmoji;
+
+        //highlight the selected emoji
+        btnClicked.setSelected(true);
+        btnClicked.setPressed(false);
 
 
        /* if(recordMoodEntry(clickedEmoji) ==1){
@@ -362,7 +450,90 @@ public class EditEntry extends AppCompatActivity {
 
 
 
+public void prepareEmoji(Emoji emo)
+{
+    Button btn =new Button(this) ;
 
+    if(emo.getMoodName().equals(EmojiName.POWERFUL)){
+
+        btn =(Button) findViewById(R.id.btnpowerful);
+    }else if(emo.getMoodName().equals(EmojiName.HAPPYARTIST)){
+        btn =(Button) findViewById(R.id.btnhappy);
+    }else if(emo.getMoodName().equals(EmojiName.EXCITED)){
+        btn =(Button) findViewById(R.id.btnexcited);
+
+    }else if(emo.getMoodName().equals(EmojiName.TIRED)){
+        btn =(Button) findViewById(R.id.btntired);
+
+    }else if(emo.getMoodName().equals(EmojiName.LONELY)){
+        btn =(Button) findViewById(R.id.btnlonely);
+
+    }else if(emo.getMoodName().equals(EmojiName.NUMB)){
+        btn =(Button) findViewById(R.id.btnnumb);
+
+    }else if(emo.getMoodName().equals(EmojiName.IRRITABLE)){
+        btn =(Button) findViewById(R.id.btnirritable);
+
+    }else if(emo.getMoodName().equals(EmojiName.SAD)){
+        btn =(Button) findViewById(R.id.btnsad);
+
+    }else if(emo.getMoodName().equals(EmojiName.FRUSTRATED)){
+        btn =(Button) findViewById(R.id.btnfrustrated);
+
+    }else if(emo.getMoodName().equals(EmojiName.WORRIED)){
+        btn =(Button) findViewById(R.id.btnworried);
+
+    }else if(emo.getMoodName().equals(EmojiName.FEARFUL)){
+        btn =(Button) findViewById(R.id.btnfearful);
+
+    }else if(emo.getMoodName().equals(EmojiName.ANGRY)){
+        btn =(Button) findViewById(R.id.btnangry);
+
+    }
+
+    btn.setSelected(true);
+    btn.setPressed(false);
+}
+
+
+void clearEmojiSelection(){
+    ((Button) findViewById(R.id.btnpowerful)).setSelected(false);
+    ((Button) findViewById(R.id.btnpowerful)).setPressed(false);
+
+    ((Button) findViewById(R.id.btnhappy)).setSelected(false);
+    ((Button) findViewById(R.id.btnhappy)).setPressed(false);
+
+
+    ((Button) findViewById(R.id.btnexcited)).setSelected(false);
+    ((Button) findViewById(R.id.btnexcited)).setPressed(false);
+
+    ((Button) findViewById(R.id.btntired)).setSelected(false);
+    ((Button) findViewById(R.id.btntired)).setPressed(false);
+
+    ((Button) findViewById(R.id.btnlonely)).setSelected(false);
+    ((Button) findViewById(R.id.btnlonely)).setPressed(false);
+
+    ((Button) findViewById(R.id.btnnumb)).setSelected(false);
+    ((Button) findViewById(R.id.btnnumb)).setPressed(false);
+
+    ((Button) findViewById(R.id.btnirritable)).setSelected(false);
+    ((Button) findViewById(R.id.btnirritable)).setPressed(false);
+
+    ((Button) findViewById(R.id.btnsad)).setSelected(false);
+    ((Button) findViewById(R.id.btnsad)).setPressed(false);
+
+    ((Button) findViewById(R.id.btnfrustrated)).setSelected(false);
+    ((Button) findViewById(R.id.btnfrustrated)).setPressed(false);
+
+    ((Button) findViewById(R.id.btnworried)).setSelected(false);
+    ((Button) findViewById(R.id.btnworried)).setPressed(false);
+
+    ((Button) findViewById(R.id.btnfearful)).setSelected(false);
+    ((Button) findViewById(R.id.btnfearful)).setPressed(false);
+
+    ((Button) findViewById(R.id.btnangry)).setSelected(false);
+    ((Button) findViewById(R.id.btnangry)).setPressed(false);
+}
 
 
 

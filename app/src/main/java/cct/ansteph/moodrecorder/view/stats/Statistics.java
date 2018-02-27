@@ -14,6 +14,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +26,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.github.mikephil.charting.animation.Easing;
@@ -72,15 +77,27 @@ import java.util.Date;
 
 import cct.ansteph.moodrecorder.R;
 import cct.ansteph.moodrecorder.api.ContentTypes;
+import cct.ansteph.moodrecorder.api.columns.ActivityColumns;
 import cct.ansteph.moodrecorder.api.columns.DiaryUserColumns;
+import cct.ansteph.moodrecorder.api.columns.EmojiColumns;
+import cct.ansteph.moodrecorder.api.columns.EntryColumns;
+import cct.ansteph.moodrecorder.api.columns.RecordedActivtyColumns;
+import cct.ansteph.moodrecorder.app.ActivityName;
+import cct.ansteph.moodrecorder.app.EmojiName;
+import cct.ansteph.moodrecorder.customview.MyBarDataSet;
 import cct.ansteph.moodrecorder.customview.PdfCustFooter;
 import cct.ansteph.moodrecorder.customview.RadarMarkerView;
+import cct.ansteph.moodrecorder.model.Activity;
 import cct.ansteph.moodrecorder.model.DiaryUser;
+import cct.ansteph.moodrecorder.model.Emoji;
 import cct.ansteph.moodrecorder.model.Entry;
 import cct.ansteph.moodrecorder.view.export.About;
 import cct.ansteph.moodrecorder.view.export.ExportData;
+import cct.ansteph.moodrecorder.view.record.Entries;
 import cct.ansteph.moodrecorder.view.record.RecordActivity;
 import cct.ansteph.moodrecorder.view.record.RecordMood;
+import cct.ansteph.moodrecorder.view.stats.statdatepicker.StatsRangeFromDate;
+import cct.ansteph.moodrecorder.view.stats.statdatepicker.StatsRangeToDate;
 
 public class Statistics extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -91,12 +108,27 @@ public class Statistics extends AppCompatActivity
     protected Typeface mTfRegular;
     protected Typeface mTfLight;
 
+    TextView txtFromDate, txtToDate;
+
+    TextView txtMoodText , txtActivityText;
+    Switch swtCustomRange;
+
     DiaryUser dUser;
 
     final private int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
     String mPDFFilePath;
     public static final String KEY_FILE_PATH = "filepath";
+
+    //just temporarily holding in memory
+    ArrayList<Emoji> mEmojiArrayList;
+    ArrayList<Activity> mActiviesArrayList;
+
+    boolean mRangedEngaged;
+    Button btnSumitRange;
+
+    protected HorizontalBarChart mActivityHozChart;
+    protected HorizontalBarChart mActivityAllDataHozChart;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -125,22 +157,126 @@ public class Statistics extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-         mActiMonthRadarChart = (RadarChart) findViewById(R.id.activityMonthChart);
+        mRangedEngaged = false;
+
+        mEmojiArrayList = retrieveEmojis();
+        mActiviesArrayList = retrieveActivities();
+
+        btnSumitRange = (Button) findViewById(R.id.btnSubmitRange);
+
+        mActiMonthRadarChart = (RadarChart) findViewById(R.id.activityMonthChart);
          mActiAllRadarChart = (RadarChart) findViewById(R.id.activityAllChart);
          mMoodMonthChart = (BarChart) findViewById(R.id.moodMonthyBar);
          mMoodAllChart = (BarChart) findViewById(R.id.moodAllBar);
 
 
-        generateMonthRadarChart();
-        generateMonthBarChart();
+        txtFromDate = (TextView) findViewById(R.id.txtFromDate);
+        txtToDate = (TextView) findViewById(R.id.txtToDate);
+
+
+        txtMoodText= (TextView) findViewById(R.id.txtMoodm);
+        txtActivityText=(TextView) findViewById(R.id.txtActivitym);
+
+        swtCustomRange = (Switch) findViewById(R.id.swtCustomRange);
+
+        swtCustomRange.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked)
+                {
+                    mRangedEngaged = true;
+                    txtFromDate.setEnabled(true);
+                    txtToDate.setEnabled(true);
+
+                    txtMoodText.setText("Custom Range");  txtActivityText.setText("Custom Range");
+                    btnSumitRange.setVisibility(View.VISIBLE);
+
+                }else{
+                    mRangedEngaged = false;
+                    txtFromDate.setEnabled(false);
+                    txtToDate.setEnabled(false);
+                    btnSumitRange.setVisibility(View.GONE);
+                    txtMoodText.setText("This Month");  txtActivityText.setText("This Month");
+                }
+            }
+        });
+        mActivityHozChart = (HorizontalBarChart) findViewById(R.id.activityMonthChartHoz);
+        mActivityAllDataHozChart = (HorizontalBarChart) findViewById(R.id.activityMonthAllDataChartHoz);
+
+        Calendar calNow = Calendar.getInstance();
+
+        int month = calNow.get(Calendar.MONTH) ;
+        String monthcon = (month<10)? "0"+String.valueOf(month+1):String.valueOf(month+1);
+
+        int year = calNow.get(Calendar.YEAR);
+        String monthStart = year+"-"+monthcon+"-01";
+        String monthEnd = year+"-"+monthcon+"-28";
+
+        generateMonthRadarChart(monthStart,monthEnd);
+        generateMonthBarChart(monthStart,monthEnd);
 
         generateAllRadarChart();
         generateAllBarChart();
 
         dUser = retrieveDiaryUser();
 
+        //generateActivityHorizontal(activityCountAnalysis( retrieveRecordedActivity("","", false)));
+       // generateActivityAllHorizontal(activityCountAnalysis( retrieveRecordedActivity("","", false)));
     }
 
+
+
+    public boolean isDatePosRanged()
+    {
+
+
+        try{
+            SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd");
+            Date fromdate = sdf.parse(txtFromDate.getText().toString());
+            Date todate = sdf.parse(txtToDate.getText().toString());
+
+            if(fromdate.compareTo(todate)==-1)
+            {
+                return true;
+            }
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+
+        return false;
+    }
+
+/*try {
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    Date parsed = sdf.parse("2016-03-10 22:05:20");
+
+    Date now = new Date(System.currentTimeMillis()); // 2016-03-10 22:06:10
+
+    System.out.println(parsed.compareTo(now));
+} catch (Exception e) {
+    e.printStackTrace();
+    will print -1, which means that parsed is before now.
+}*/
+
+
+    public  void onSubmitRangeClicked(View view)
+    {
+        if(isDatePosRanged())
+        {
+
+            String fromDate = txtFromDate.getText().toString();
+            String toDate = txtToDate.getText().toString();
+
+            generateMonthBarChart(fromDate,toDate);
+            generateMonthRadarChart(fromDate,toDate);
+        }else{
+            Toast.makeText(this, "The date 'from' cannot be after the date 'to'",Toast.LENGTH_LONG).show();
+        }
+
+
+    }
 
 
     private DiaryUser retrieveDiaryUser (){
@@ -170,11 +306,635 @@ public class Statistics extends AppCompatActivity
         return user;
     }
 
+    public void onFromDateClicked(View view)
+    {
+        DialogFragment nf = new StatsRangeFromDate();
+        nf.show(getSupportFragmentManager(), "From Date");
+    }
 
+    public void onToDateClicked(View view)
+    {
+        DialogFragment nf = new StatsRangeToDate();
+        nf.show(getSupportFragmentManager(),"To Date");
+    }
+
+
+    private ArrayList<Entry> retrieveEntries(String startDate , String endDate, boolean isRanged)
+    {
+        ContentResolver resolver = getContentResolver();
+
+        Cursor cursor = null;
+
+        if(isRanged)
+        {
+             cursor = resolver.query(ContentTypes.ENTRY_CONTENT_URI, EntryColumns.PROJECTION,
+                    EntryColumns.RECORDDATE_ID +">=? and " + EntryColumns.RECORDDATE_ID+"<=?", new String[]{startDate, endDate},null);
+
+        }else {
+
+             cursor = resolver.query(ContentTypes.ENTRY_CONTENT_URI, EntryColumns.PROJECTION,
+                     null, null,null);}
+        ArrayList<Entry> entries = new ArrayList<>();
+
+        if(cursor.moveToFirst()){
+            do{
+                Entry entry = new Entry();
+
+                entry.setId((cursor.getString(0))!=null ? Integer.parseInt(cursor.getString(0)):0);
+                int emojiId =(cursor.getString(cursor.getColumnIndex(EntryColumns.EMOJI_ID)))!=null ? Integer.parseInt(cursor.getString(cursor.getColumnIndex(EntryColumns.EMOJI_ID))):0;
+                entry.setEmoji(retrieveEmojiById(emojiId));
+                entry.setRecordDate(cursor.getString(cursor.getColumnIndex(EntryColumns.RECORDDATE_ID)));
+                entry.setRecordTime(cursor.getString(cursor.getColumnIndex(EntryColumns.RECORDTIME_ID)));
+
+
+                //retrieve the activities
+                // entry.setActivityList(retrieveRecordedActivity(entry.getId()));
+
+
+                entries.add(entry);
+
+            }while(cursor.moveToNext());
+        }
+
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+
+        return entries;
+    }
+
+
+
+
+    private ArrayList<Activity> retrieveRecordedActivity(String startDate , String endDate, boolean isRanged)
+    {
+        ContentResolver resolver = getContentResolver();
+
+        /*Cursor cursor = resolver.query(ContentTypes.ORGANISATION_CONTENT_URI, OrganisationColumns.PROJECTION,
+                OrganisationColumns.WORK_AREA_ID + "=?",new String[]{String.valueOf(cat.getId())},null);
+        */
+
+      //  Cursor  cursor = resolver.query(ContentTypes.RECORDEDACTIVITY_CONTENT_URI, RecordedActivtyColumns.PROJECTION,
+        //        RecordedActivtyColumns.ENTRY_ID + "=?", new String[]{String.valueOf(entry_id)},null);
+        Cursor  cursor = null;
+        if(isRanged)
+        {
+            cursor = resolver.query(ContentTypes.RECORDEDACTIVITY_CONTENT_URI, RecordedActivtyColumns.PROJECTION,
+                    RecordedActivtyColumns.TIME_CREATED +">=? and " + RecordedActivtyColumns.TIME_CREATED+"<=?", new String[]{startDate, endDate},null);
+
+
+
+        }else{
+            cursor = resolver.query(ContentTypes.RECORDEDACTIVITY_CONTENT_URI, RecordedActivtyColumns.PROJECTION,
+                    null, null,null);
+        }
+
+
+
+
+        ArrayList<Activity> activities = new ArrayList<>();
+
+        if(cursor.moveToFirst()){
+            do{
+                Activity activity = new Activity();
+
+                int activity_id =(cursor.getString(cursor.getColumnIndex(RecordedActivtyColumns.ACTIVITY_ID)))!=null ? Integer.parseInt(cursor.getString(cursor.getColumnIndex(RecordedActivtyColumns.ACTIVITY_ID))):0;
+                activity= retrieveActivityById(activity_id);
+
+                activities.add(activity);
+
+            }while(cursor.moveToNext());
+        }
+
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+        return activities;
+    }
+
+
+
+
+
+
+    private ArrayList<Activity> retrieveActivities()
+    {
+        ContentResolver resolver = getContentResolver();
+
+        Cursor cursor = resolver.query(ContentTypes.ACTIVITY_CONTENT_URI, ActivityColumns.PROJECTION, null, null,null);
+        ArrayList<Activity> activities = new ArrayList<>();
+
+        if(cursor.moveToFirst()){
+            do{
+                Activity activity = new Activity(
+                        ((cursor.getString(0))!=null ? Integer.parseInt(cursor.getString(0)):0),
+                        (cursor.getString(cursor.getColumnIndex(ActivityColumns.NAME))),
+                        (cursor.getBlob(cursor.getColumnIndex(ActivityColumns.IMAGEBYTE)))
+                );
+
+                activities.add(activity);
+
+            }while(cursor.moveToNext());
+        }
+
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+
+        return activities;
+    }
+
+
+    private int[] activityCountAnalysis(ArrayList<Activity> activities)
+    {
+        int workCount = 0,relaxCount=0, friendsCount =0;
+        int dateCount= 0 , sportCount= 0, partyCount= 0;
+        int moviesCount= 0, readingCount= 0, shoppingCount= 0;
+        int travelCount= 0, foodCount= 0, cleaningCount= 0;
+
+
+
+        for(Activity act: activities)
+        {
+            if(act.getActivityName().equals(ActivityName.WORK)){
+                workCount++;
+
+            }else if (act.getActivityName().equals(ActivityName.RELAX)){
+                relaxCount++;
+
+            }else if (act.getActivityName().equals(ActivityName.FRIENDS)){
+                friendsCount++;
+
+            }else if (act.getActivityName().equals(ActivityName.DATE)){
+                dateCount++;
+
+            }else if (act.getActivityName().equals(ActivityName.SPORT)){
+                sportCount++;
+
+            }else if (act.getActivityName().equals(ActivityName.PARTY)){
+                partyCount++;
+
+            }else if (act.getActivityName().equals(ActivityName.MOVIES)){
+                moviesCount++;
+
+            }else if (act.getActivityName().equals(ActivityName.READING)){
+                readingCount++;
+
+            }else if (act.getActivityName().equals(ActivityName.SHOPPING)){
+                shoppingCount++;
+
+            }else if (act.getActivityName().equals(ActivityName.TRAVEL)){
+                travelCount++;
+
+            }else if (act.getActivityName().equals(ActivityName.FOOD)){
+                foodCount++;
+            }else if (act.getActivityName().equals(ActivityName.CLEANING)){
+                cleaningCount++;
+            }
+        }
+
+        int [] countedValue = new int[]{ workCount ,relaxCount, friendsCount, dateCount , sportCount, partyCount,
+         moviesCount, readingCount, shoppingCount, travelCount, foodCount, cleaningCount};
+
+        return countedValue;
+
+    }
+
+
+
+    private int[] moodCountAnalysis(ArrayList<Entry> entries)
+    {
+        int powerCount = 0,happyCount=0, excitedCount =0;
+        int lonelyCount= 0 , tiredCount= 0, numbCount= 0;
+        int irritableCount= 0, sadCount= 0, frustratedCount= 0;
+        int worriedCount= 0, fearfulCount= 0, angryCount= 0;
+
+        for(Entry ent: entries)
+        {
+            if(ent.getEmoji().getMoodName().equals(EmojiName.ANGRY)){
+                angryCount++;
+
+            }else if (ent.getEmoji().getMoodName().equals(EmojiName.EXCITED)){
+                excitedCount++;
+
+            }else if (ent.getEmoji().getMoodName().equals(EmojiName.FEARFUL)){
+                fearfulCount++;
+
+            }else if (ent.getEmoji().getMoodName().equals(EmojiName.FRUSTRATED)){
+                frustratedCount++;
+
+            }else if (ent.getEmoji().getMoodName().equals(EmojiName.HAPPYARTIST)){
+                happyCount++;
+
+            }else if (ent.getEmoji().getMoodName().equals(EmojiName.IRRITABLE)){
+                irritableCount++;
+
+            }else if (ent.getEmoji().getMoodName().equals(EmojiName.LONELY)){
+                lonelyCount++;
+
+            }else if (ent.getEmoji().getMoodName().equals(EmojiName.TIRED)){
+                tiredCount++;
+
+            }else if (ent.getEmoji().getMoodName().equals(EmojiName.POWERFUL)){
+                powerCount++;
+
+            }else if (ent.getEmoji().getMoodName().equals(EmojiName.NUMB)){
+                numbCount++;
+
+            }else if (ent.getEmoji().getMoodName().equals(EmojiName.WORRIED)){
+                worriedCount++;
+            }else if (ent.getEmoji().getMoodName().equals(EmojiName.SAD)){
+                sadCount++;
+            }
+        }
+
+        int [] countedValue = new int[]{ powerCount ,happyCount, excitedCount , lonelyCount , tiredCount, numbCount,
+        irritableCount, sadCount, frustratedCount ,  worriedCount, fearfulCount, angryCount};
+
+        return countedValue;
+
+    }
+
+    private ArrayList<Emoji> retrieveEmojis()
+    {
+        ContentResolver resolver = getContentResolver();
+
+        Cursor  cursor = resolver.query(ContentTypes.EMOJI_CONTENT_URI, EmojiColumns.PROJECTION, null, null,null);
+        ArrayList<Emoji> emojis = new ArrayList<>();
+
+        if(cursor.moveToFirst()){
+            do{
+                Emoji emoji = new Emoji(
+                        ((cursor.getString(0))!=null ? Integer.parseInt(cursor.getString(0)):0),
+                        (cursor.getString(cursor.getColumnIndex(EmojiColumns.MOODNAME))),
+                        (cursor.getBlob(cursor.getColumnIndex(EmojiColumns.IMAGEBYTE)))
+                );
+
+                emojis.add(emoji);
+
+            }while(cursor.moveToNext());
+        }
+
+        if (cursor != null && !cursor.isClosed()) {
+            cursor.close();
+        }
+
+        return emojis;
+    }
+
+
+    private Emoji retrieveEmojiById(int id)
+    {
+        for(Emoji emoji: mEmojiArrayList)
+        {
+            if(id == emoji.getId()){
+                return emoji;
+            }
+        }
+        return null;
+    }
+
+
+    private Activity retrieveActivityById(int id)
+    {
+        for(Activity acti: mActiviesArrayList)
+        {
+            if(id== acti.getId()){
+                return acti;
+            }
+        }
+        return null;
+    }
+
+    /***************************************-----------horizontal chart-------------------------*****************/
+    public void generateActivityHorizontal(int[] values)
+    {
+        mActivityHozChart.setDrawBarShadow(false);
+
+        mActivityHozChart.setDrawValueAboveBar(true);
+
+        mActivityHozChart.getDescription().setEnabled(false);
+
+
+        // if more than 60 entries are displayed in the chart, no values will be
+        // drawn
+        mActivityHozChart.setMaxVisibleValueCount(60);
+
+        // scaling can now only be done on x- and y-axis separately
+        mActivityHozChart.setPinchZoom(false);
+
+        // draw shadows for each bar that show the maximum value
+        // mChart.setDrawBarShadow(true);
+        final ArrayList<String> xLabelCat = new ArrayList<>();
+        xLabelCat.add("work");
+        xLabelCat.add("relax");
+        xLabelCat.add("friends");
+        xLabelCat.add("date");
+        xLabelCat.add("sport");
+        xLabelCat.add("party");
+        xLabelCat.add("movies");
+        xLabelCat.add("reading");
+        xLabelCat.add("shopping");
+        xLabelCat.add("travel");
+        xLabelCat.add("food");
+        xLabelCat.add("cleaning");
+
+
+
+
+
+        mActivityHozChart.setDrawGridBackground(false);
+
+        XAxis xl = mActivityHozChart.getXAxis();
+        xl.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xl.setTypeface(mTfLight);
+        xl.setDrawAxisLine(false);
+        xl.setDrawGridLines(false);
+        xl.setGranularity(1f);
+        xl.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return xLabelCat.get((int)(value/10));
+                //  return "a text " + value;
+            }
+        });
+
+        //the one on top
+        YAxis yl = mActivityHozChart.getAxisLeft();
+        yl.setTypeface(mTfLight);
+        yl.setDrawAxisLine(true);
+        yl.setDrawGridLines(false);
+        yl.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+//        yl.setInverted(true);
+
+        // the one in the bottom
+        YAxis yr = mActivityHozChart.getAxisRight();
+        yr.setTypeface(mTfLight);
+        yr.setDrawAxisLine(false);
+        yr.setDrawGridLines(false);
+        yr.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+//        yr.setInverted(true);*/
+
+
+        ///////***************************set the data **********************/////
+        float barWidth = 6f;
+        float spaceForBar = 6f;
+        ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
+
+     /*   float [] percentage = new float[]{ auditCharter.getGA_Score_Per(),auditCharter.getRA_Score_Per(),auditCharter.getMS_Score_Per(),
+                auditCharter.getAP_Score_Per(),auditCharter.getTA_Score_Per(),auditCharter.getEIM_Score_Per(),auditCharter.getMM_Score_Per(),
+                auditCharter.getPO_Score_Per()
+        };*/
+
+
+      /*  for (int i = 0; i < 8; i++) {
+            //float val = (float) (Math.random() * 100);percentage[i]
+            float val = percentage[i];
+
+            if(val<=49)
+            {
+                yVals1.add(new BarEntry(i * spaceForBar, val,
+                        getResources().getDrawable(R.drawable.ic_shutdown)));
+            }
+            else if (val>=50 && val<=74 )
+            {
+                yVals1.add(new BarEntry(i * spaceForBar, val,
+                        getResources().getDrawable(R.drawable.ic_alerts)));
+            }else if (val>=75)
+            {
+                yVals1.add(new BarEntry(i * spaceForBar, val,
+                        getResources().getDrawable(R.drawable.ic_alright)));
+            }
+
+        }*/
+
+        for (int i = 0; i < values.length-1; i++) {
+            float val = values[i];
+            yVals1.add(new BarEntry(i * spaceForBar, val));
+           // yVals1.add(new BarEntry(i , val));
+        }
+
+        BarDataSet set1;
+        set1 = new BarDataSet(yVals1, "Loic Set 1");
+        set1.setDrawIcons(false);
+
+
+        MyBarDataSet customSet = new MyBarDataSet(yVals1, "");
+        customSet.setColors(ContextCompat.getColor(this, R.color.chartColorRed),ContextCompat.getColor(this, R.color.chartColorOrange),
+                ContextCompat.getColor(this, R.color.chartColorGreen));
+
+        customSet.setDrawValues(false);
+
+        ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
+        // dataSets.add(set1);
+        dataSets.add(customSet);
+
+        BarData data = new BarData(dataSets);
+        data.setValueTextSize(10f);
+        data.setValueTypeface(mTfLight);
+        data.setBarWidth(barWidth);
+        mActivityHozChart.setData(data);
+
+
+
+        ///////*************************** end set the data **********************/////
+
+        mActivityHozChart.setFitBars(true);
+        mActivityHozChart.animateY(2500);
+
+        // setting data
+        // mSeekBarY.setProgress(50);
+        // mSeekBarX.setProgress(12);
+
+        //mSeekBarY.setOnSeekBarChangeListener(this);
+        //mSeekBarX.setOnSeekBarChangeListener(this);
+
+        Legend l = mActivityHozChart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setFormSize(8f);
+        l.setXEntrySpace(4f);
+
+    }
+
+
+
+///all time data chart ///////////////////////////
+
+    public void generateActivityAllHorizontal(int[] values)
+    {
+        mActivityAllDataHozChart.setDrawBarShadow(false);
+
+        mActivityAllDataHozChart.setDrawValueAboveBar(true);
+
+        mActivityAllDataHozChart.getDescription().setEnabled(false);
+
+
+        // if more than 60 entries are displayed in the chart, no values will be
+        // drawn
+        mActivityAllDataHozChart.setMaxVisibleValueCount(60);
+
+        // scaling can now only be done on x- and y-axis separately
+        mActivityAllDataHozChart.setPinchZoom(false);
+
+        // draw shadows for each bar that show the maximum value
+        // mChart.setDrawBarShadow(true);
+        final ArrayList<String> xLabelCat = new ArrayList<>();
+        xLabelCat.add("work");
+        xLabelCat.add("relax");
+        xLabelCat.add("friends");
+        xLabelCat.add("date");
+        xLabelCat.add("sport");
+        xLabelCat.add("party");
+        xLabelCat.add("movies");
+        xLabelCat.add("reading");
+        xLabelCat.add("shopping");
+        xLabelCat.add("travel");
+        xLabelCat.add("food");
+        xLabelCat.add("cleaning");
+
+
+
+
+
+        mActivityHozChart.setDrawGridBackground(false);
+
+        XAxis xl = mActivityAllDataHozChart.getXAxis();
+        xl.setPosition(XAxis.XAxisPosition.BOTTOM);
+        xl.setTypeface(mTfLight);
+        xl.setDrawAxisLine(false);
+        xl.setDrawGridLines(false);
+        xl.setGranularity(1f);
+        xl.setValueFormatter(new IAxisValueFormatter() {
+            @Override
+            public String getFormattedValue(float value, AxisBase axis) {
+                return xLabelCat.get((int)(value/10));
+                //  return "a text " + value;
+            }
+        });
+
+        //the one on top
+        YAxis yl = mActivityAllDataHozChart.getAxisLeft();
+        yl.setTypeface(mTfLight);
+        yl.setDrawAxisLine(true);
+        yl.setDrawGridLines(false);
+        yl.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+//        yl.setInverted(true);
+
+        // the one in the bottom
+        YAxis yr = mActivityAllDataHozChart.getAxisRight();
+        yr.setTypeface(mTfLight);
+        yr.setDrawAxisLine(false);
+        yr.setDrawGridLines(false);
+        yr.setAxisMinimum(0f); // this replaces setStartAtZero(true)
+//        yr.setInverted(true);*/
+
+
+        ///////***************************set the data **********************/////
+        float barWidth = 06f;
+        float spaceForBar = 10f;
+        ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
+        Drawable[] icons = new Drawable[]{
+                getResources().getDrawable(R.drawable.mood_powerful),
+                getResources().getDrawable(R.drawable.mood_happy),
+                getResources().getDrawable(R.drawable.mood_excited),
+                getResources().getDrawable(R.drawable.mood_tired),
+                getResources().getDrawable(R.drawable.mood_lonely),
+                getResources().getDrawable(R.drawable.mood_numb),
+                getResources().getDrawable(R.drawable.mood_irritable),
+                getResources().getDrawable(R.drawable.mood_sadness),
+                getResources().getDrawable(R.drawable.mood_frustrated),
+                getResources().getDrawable(R.drawable.mood_worried),
+                getResources().getDrawable(R.drawable.mood_fearfull),
+                getResources().getDrawable(R.drawable.mood_angry)
+
+        };
+     /*   float [] percentage = new float[]{ auditCharter.getGA_Score_Per(),auditCharter.getRA_Score_Per(),auditCharter.getMS_Score_Per(),
+                auditCharter.getAP_Score_Per(),auditCharter.getTA_Score_Per(),auditCharter.getEIM_Score_Per(),auditCharter.getMM_Score_Per(),
+                auditCharter.getPO_Score_Per()
+        };*/
+
+
+      /*  for (int i = 0; i < 8; i++) {
+            //float val = (float) (Math.random() * 100);percentage[i]
+            float val = percentage[i];
+
+            if(val<=49)
+            {
+                yVals1.add(new BarEntry(i * spaceForBar, val,
+                        getResources().getDrawable(R.drawable.ic_shutdown)));
+            }
+            else if (val>=50 && val<=74 )
+            {
+                yVals1.add(new BarEntry(i * spaceForBar, val,
+                        getResources().getDrawable(R.drawable.ic_alerts)));
+            }else if (val>=75)
+            {
+                yVals1.add(new BarEntry(i * spaceForBar, val,
+                        getResources().getDrawable(R.drawable.ic_alright)));
+            }
+
+        }*/
+
+        for (int i = 0; i < values.length; i++) {
+            float val = values[i];
+           // yVals1.add(new BarEntry(i * spaceForBar, val,icons[i]));
+          //   yVals1.add(new BarEntry(i * spaceForBar, val));
+            yVals1.add(new BarEntry(i * spaceForBar, 6));
+        }
+
+        BarDataSet set1;
+        set1 = new BarDataSet(yVals1, "Set 1");
+        set1.setDrawIcons(false);
+
+
+        MyBarDataSet customSet = new MyBarDataSet(yVals1, "");
+        customSet.setColors(ContextCompat.getColor(this, R.color.chartColorRed),ContextCompat.getColor(this, R.color.chartColorOrange),
+                ContextCompat.getColor(this, R.color.chartColorGreen));
+
+        customSet.setDrawValues(false);
+
+        ArrayList<IBarDataSet> dataSets = new ArrayList<IBarDataSet>();
+        // dataSets.add(set1);
+        dataSets.add(customSet);
+
+        BarData data = new BarData(dataSets);
+        data.setValueTextSize(10f);
+        data.setValueTypeface(mTfLight);
+        data.setBarWidth(barWidth);
+        mActivityAllDataHozChart.setData(data);
+
+
+
+        ///////*************************** end set the data **********************/////
+
+        mActivityAllDataHozChart.setFitBars(true);
+        mActivityAllDataHozChart.animateY(2500);
+
+        // setting data
+        // mSeekBarY.setProgress(50);
+        // mSeekBarX.setProgress(12);
+
+        //mSeekBarY.setOnSeekBarChangeListener(this);
+        //mSeekBarX.setOnSeekBarChangeListener(this);
+
+        Legend l = mActivityAllDataHozChart.getLegend();
+        l.setVerticalAlignment(Legend.LegendVerticalAlignment.BOTTOM);
+        l.setHorizontalAlignment(Legend.LegendHorizontalAlignment.LEFT);
+        l.setOrientation(Legend.LegendOrientation.HORIZONTAL);
+        l.setDrawInside(false);
+        l.setFormSize(8f);
+        l.setXEntrySpace(4f);
+
+    }
+
+    /***************************************-----------end horizontal chart-------------------------*****************/
 
     /***************************************-----------bar chart-------------------------*****************/
 
-    public void generateMonthBarChart()
+    public void generateMonthBarChart(String fromDate , String toDate)
     {
         mMoodMonthChart.setDrawBarShadow(false);
         mMoodMonthChart.setDrawValueAboveBar(true);
@@ -249,15 +1009,22 @@ public class Statistics extends AppCompatActivity
      //   XYMarkerView mv = new XYMarkerView(this, xAxisFormatter);
        // mv.setChartView(mChart); // For bounds control
         //mChart.setMarker(mv); // Set the marker to the chart
-        setMonthChartData(12, 10);
+
+
+
+
+
+        setMonthChartData(moodCountAnalysis(retrieveEntries(fromDate,toDate,true)), 10);
 
     }
 
 
 
-    private void setMonthChartData(int count, float range) {
+    private void setMonthChartData(int [] values, float range) {
 
         float start = 1f;
+
+        //float [] values = new float[]{3,3,3,3,4,4,4,4,5,5,5,5};
 
         ArrayList<BarEntry> yVals1 = new ArrayList<BarEntry>();
 
@@ -278,9 +1045,9 @@ public class Statistics extends AppCompatActivity
         };
 
 
-        for (int i = 0; i <  count ; i++) {
+        for (int i = 0; i <  values.length ; i++) {
             float mult = (range + 1);
-            float val = (float) (Math.random() * mult);
+            float val =  values[i]*1;// (float) (Math.random() * mult);
 
             yVals1.add(new BarEntry(i, val, icons[i] ));
 
@@ -394,12 +1161,12 @@ public class Statistics extends AppCompatActivity
         //   XYMarkerView mv = new XYMarkerView(this, xAxisFormatter);
         // mv.setChartView(mChart); // For bounds control
         //mChart.setMarker(mv); // Set the marker to the chart
-        setAllChartData(12, 20);
+        setAllChartData(moodCountAnalysis(retrieveEntries("","",false)), 20);
 
     }
 
 
-    private void setAllChartData(int count, float range) {
+    private void setAllChartData(int [] values, float range) {
 
         float start = 1f;
 
@@ -422,9 +1189,9 @@ public class Statistics extends AppCompatActivity
         };
 
 
-        for (int i = 0; i <  count ; i++) {
+        for (int i = 0; i <  values.length ; i++) {
             float mult = (range + 1);
-            float val = (float) (Math.random() * mult);
+            float val =  values[i]*1; // (float) (Math.random() * mult);
 
             yVals1.add(new BarEntry(i, val, icons[i] ));
 
@@ -471,7 +1238,7 @@ public class Statistics extends AppCompatActivity
 
 
 
-    public void generateMonthRadarChart()
+    public void generateMonthRadarChart(String fromDate, String toDate)
     {
 
         mActiMonthRadarChart.setBackgroundColor(Color.rgb(241, 245, 248));
@@ -491,7 +1258,7 @@ public class Statistics extends AppCompatActivity
 
 
         //setradarData
-        setRadarMonthData( );
+        setRadarMonthData(activityCountAnalysis(retrieveRecordedActivity(fromDate,toDate,true)) );
 
         mActiMonthRadarChart.animateXY(
                 1400, 1400,
@@ -519,7 +1286,7 @@ public class Statistics extends AppCompatActivity
 
         YAxis yAxis = mActiMonthRadarChart.getYAxis();
         yAxis.setTypeface(mTfLight);
-        yAxis.setLabelCount(8, false);
+        yAxis.setLabelCount(12, true);
         yAxis.setTextSize(9f);
         yAxis.setAxisMinimum(0f);
         yAxis.setAxisMaximum(80f);
@@ -539,13 +1306,21 @@ public class Statistics extends AppCompatActivity
 
 
 
-    private void setRadarMonthData( ) {
-        float mult = 80;
-        float min = 20;
+    private void setRadarMonthData(int [] values ) {
+        float mult = 20;
+        float min = 10;
         int cnt = 12;
 
         ArrayList<RadarEntry> entries1 = new ArrayList<RadarEntry>();
         ArrayList<RadarEntry> entries2 = new ArrayList<RadarEntry>();
+
+        int totalActiNum =0;
+
+        for(int i=0;  i < values.length; i++)
+        {
+            totalActiNum+=values[i];
+        }
+
 
 //this will the actual value to be displayed
         float [] percentage = new float[]{
@@ -553,16 +1328,16 @@ public class Statistics extends AppCompatActivity
 
         // NOTE: The order of the entries when being added to the entries array determines their position around the center of
         // the chart.
-        for (int i = 0; i < cnt; i++) {
-            float val1 = (float) 1;
-            entries1.add(new RadarEntry(val1));
+        for (int i = 0; i < values.length; i++) {
+            float val1 = (((float) values[i] /(float) totalActiNum) * 100);//mult)+min;// (float) 1;
+            entries1.add(new RadarEntry(val1 ));
 
             float val2 =  (float) (Math.random() * mult) + min; //percentage[i];//
             entries2.add(new RadarEntry(val2));
         }
 
 
-        RadarDataSet set1 = new RadarDataSet(entries1, "Last month");
+        RadarDataSet set1 = new RadarDataSet(entries1, "This month");
         set1.setColor(Color.rgb(103, 110, 129));
         set1.setFillColor(Color.rgb(103, 110, 129));
         set1.setDrawFilled(true);
@@ -582,7 +1357,7 @@ public class Statistics extends AppCompatActivity
 
         ArrayList<IRadarDataSet> sets = new ArrayList<IRadarDataSet>();
         sets.add(set1);
-        sets.add(set2);
+       // sets.add(set2);
 
         RadarData data = new RadarData(sets);
         data.setValueTypeface(mTfLight);
@@ -619,7 +1394,7 @@ public class Statistics extends AppCompatActivity
 
 
         //setradarData
-        setRadarAllData( );
+        setRadarAllData(activityCountAnalysis(retrieveRecordedActivity("","",false) ));
 
         mActiAllRadarChart.animateXY(
                 1400, 1400,
@@ -667,7 +1442,7 @@ public class Statistics extends AppCompatActivity
 
 
 
-    private void setRadarAllData( ) {
+    private void setRadarAllData( int[] values) {
         float mult = 80;
         float min = 20;
         int cnt = 12;
@@ -675,22 +1450,29 @@ public class Statistics extends AppCompatActivity
         ArrayList<RadarEntry> entries1 = new ArrayList<RadarEntry>();
         ArrayList<RadarEntry> entries2 = new ArrayList<RadarEntry>();
 
+        int totalActiNum =0;
+
+        for(int i=0;  i < values.length; i++)
+        {
+            totalActiNum+=values[i];
+        }
+
 //this will the actual value to be displayed
         float [] percentage = new float[]{
         };
 
         // NOTE: The order of the entries when being added to the entries array determines their position around the center of
         // the chart.
-        for (int i = 0; i < cnt; i++) {
-            float val1 = (float) 1;
+        for (int i = 0; i < values.length; i++) {
+            float val1 = (((float) values[i] /(float) totalActiNum) * 100);//values[i];// (float) 1;
             entries1.add(new RadarEntry(val1));
 
-            float val2 =  (float) (Math.random() * mult) + min; //percentage[i];//
+            float val2 = values[i] +min ;//(float) (Math.random() * mult) + min; //percentage[i];//
             entries2.add(new RadarEntry(val2));
         }
 
 
-        RadarDataSet set1 = new RadarDataSet(entries1, "Last month");
+        RadarDataSet set1 = new RadarDataSet(entries1, "All Time");
         set1.setColor(Color.rgb(103, 110, 129));
         set1.setFillColor(Color.rgb(103, 110, 129));
         set1.setDrawFilled(true);
@@ -710,7 +1492,7 @@ public class Statistics extends AppCompatActivity
 
         ArrayList<IRadarDataSet> sets = new ArrayList<IRadarDataSet>();
         sets.add(set1);
-        sets.add(set2);
+       // sets.add(set2);
 
         RadarData data = new RadarData(sets);
         data.setValueTypeface(mTfLight);
@@ -777,7 +1559,7 @@ public class Statistics extends AppCompatActivity
         } else if (id == R.id.nav_record_activity) {
             startActivity(new Intent(getApplicationContext(), RecordActivity.class));
         } else if (id == R.id.nav_entry) {
-            startActivity(new Intent(getApplicationContext(), Entry.class));
+            startActivity(new Intent(getApplicationContext(), Entries.class));
         } else if (id == R.id.nav_statistic) {
           //  startActivity(new Intent(getApplicationContext(), Statistics.class));
         } else if (id == R.id.nav_calendar) {

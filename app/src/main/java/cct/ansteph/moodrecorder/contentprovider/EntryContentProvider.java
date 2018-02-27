@@ -83,7 +83,7 @@ public class EntryContentProvider extends ContentProvider {
         String orderBy;
         if(TextUtils.isEmpty(sortOrder))
         {
-            orderBy = EntryColumns._ID;
+            orderBy = EntryColumns.RECORDDATE_ID;
         }else {
             orderBy =sortOrder;
         }

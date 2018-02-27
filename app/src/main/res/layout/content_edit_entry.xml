@@ -11,6 +11,7 @@
 
 <LinearLayout
     android:orientation="vertical"
+    android:paddingBottom="60dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
@@ -45,7 +46,7 @@
             android:layout_height="?android:listPreferredItemHeight"
             android:layout_marginTop="5dp"
             android:layout_weight="1"
-            android:text="Sat, 11 March"
+            android:text="2018-02-01"
             android:clickable="true"
             android:onClick="onStartDateClicked"
             android:gravity="center"
@@ -100,62 +101,62 @@
 
 
             <Button
-                style="@style/emoji_button"
+                style="@style/emoji_edit_button"
                 android:id="@+id/btnpowerful"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@null"
+
                 android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_powerful"
                 android:text="powerful" />
 
             <Button
-                style="@style/emoji_button"
+                style="@style/emoji_edit_button"
                 android:id="@+id/btnhappy"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@null"
+
                 android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_happy_artist"
                 android:text="happy" />
 
             <Button
-                style="@style/emoji_button"
+                style="@style/emoji_edit_button"
                 android:id="@+id/btnexcited"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@null"
+
                 android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_excited"
                 android:text="excited" />
 
             <Button
-                style="@style/emoji_button"
+                style="@style/emoji_edit_button"
                 android:id="@+id/btntired"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@null"
+
                 android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_tired"
                 android:text="tired" />
 
             <Button
-                style="@style/emoji_button"
+                style="@style/emoji_edit_button"
                 android:id="@+id/btnlonely"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@null"
+
                 android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_lonely"
                 android:text="lonely" />
 
             <Button
-                style="@style/emoji_button"
+                style="@style/emoji_edit_button"
                 android:id="@+id/btnnumb"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -185,71 +186,72 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
+            android:background="@color/colorWhite"
             android:paddingLeft="16dp"
             android:paddingRight="16dp">
 
             <Button
-                style="@style/emoji_button"
+                style="@style/emoji_edit_button"
                 android:id="@+id/btnirritable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@null"
+
                 android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_irritable"
                 android:text="irritable" />
 
             <Button
-                style="@style/emoji_button"
+                style="@style/emoji_edit_button"
                 android:id="@+id/btnsad"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@null"
+
                 android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_sadness"
                 android:text="sad" />
 
             <Button
-                style="@style/emoji_button"
+                style="@style/emoji_edit_button"
                 android:id="@+id/btnfrustrated"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@null"
+
                 android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_frustated"
                 android:text="frustrated" />
 
 
             <Button
-                style="@style/emoji_button"
+                style="@style/emoji_edit_button"
                 android:id="@+id/btnworried"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@null"
+
                 android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_worried"
                 android:text="worried" />
 
             <Button
-                style="@style/emoji_button"
+                style="@style/emoji_edit_button"
                 android:id="@+id/btnfearful"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@null"
+
                 android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_fearfull"
                 android:text="fearful" />
             <Button
-                style="@style/emoji_button"
+                style="@style/emoji_edit_button"
                 android:id="@+id/btnangry"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="@null"
+
                 android:onClick="getEmojiClickedEdt"
                 android:drawableTop="@mipmap/ic_mood_angry"
                 android:text="angry" />
@@ -410,7 +412,17 @@
 
     </HorizontalScrollView>
 
-
+    <EditText
+        android:id="@+id/edtAddedNote"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_margin="16dp"
+        android:paddingRight="16dp"
+        android:paddingLeft="16dp"
+        android:hint="Add Note..."
+        android:background="@drawable/just_border"
+        android:ems="10"
+        android:inputType="textMultiLine" />
 
 
 </LinearLayout>
