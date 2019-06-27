@@ -2,19 +2,28 @@ package cct.ansteph.moodrecorder.view.record;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.SQLException;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.yarolegovich.lovelydialog.LovelyDialogCompat;
+import com.yarolegovich.lovelydialog.LovelySaveStateHandler;
+import com.yarolegovich.lovelydialog.LovelyStandardDialog;
 
 import java.util.ArrayList;
 
@@ -45,6 +54,11 @@ public class EditEntry extends AppCompatActivity {
 
     EditText edtAddedNote;
 
+
+    private static final int ID_STANDARD_DIALOG = R.id.action_delete;
+    private LovelySaveStateHandler saveStateHandler;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,7 +66,7 @@ public class EditEntry extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
+        saveStateHandler = new LovelySaveStateHandler();
 
 
         txtStartDate= (TextView) findViewById(R.id.txtstartdateday);
@@ -229,6 +243,17 @@ public class EditEntry extends AppCompatActivity {
     }
 
 
+    public void deleteEntry(int entryID)throws SQLException {
+
+        String entry_id = String.valueOf( entryID);
+
+        deleteActivities(entryID);
+
+        getContentResolver().delete(ContentTypes.ENTRY_CONTENT_URI, EntryColumns._ID+" =?", new String[]{entry_id});
+
+    }
+
+
     public int updateEntry(int entryID)
     {
         String entry_id = String.valueOf( entryID);
@@ -309,7 +334,7 @@ public class EditEntry extends AppCompatActivity {
         }
 
 
-        if(!mClickedActivies.contains(activity))
+        if(!alreadyContained(mClickedActivies, activity) )
         {
             mClickedActivies.add(activity);
             btnClicked.setSelected(true);
@@ -319,7 +344,7 @@ public class EditEntry extends AppCompatActivity {
         }else
         {
             try{
-                mClickedActivies.remove(activity);
+                mClickedActivies.remove(getActivityPosition(mClickedActivies, activity));
                 btnClicked.setSelected(false);
                 btnClicked.setPressed(false);
                 // Toast.makeText(this, activity.getActivityName() +" removed", Toast.LENGTH_SHORT).show();
@@ -334,6 +359,34 @@ public class EditEntry extends AppCompatActivity {
         //Toast.makeText(this, mClickedActivies.get(mClickedActivies.size()-1).getActivityName(), Toast.LENGTH_SHORT).show();
 
 
+    }
+
+
+    boolean alreadyContained(ArrayList<Activity>list, Activity activity)
+    {
+
+        for(Activity act: list)
+        {
+            if(act.getId()==activity.getId()){
+                return  true;
+            }
+        }
+
+        return false;
+    }
+
+
+    int getActivityPosition(ArrayList<Activity>list, Activity activity)
+    {
+
+        for(int  i= 0 ; i<list.size(); i++)
+        {
+            if(list.get(i).getId()==activity.getId()){
+                return  i;
+            }
+        }
+
+        return -1;
     }
 
 
@@ -450,6 +503,8 @@ public class EditEntry extends AppCompatActivity {
 
 
 
+
+
 public void prepareEmoji(Emoji emo)
 {
     Button btn =new Button(this) ;
@@ -537,7 +592,91 @@ void clearEmojiSelection(){
 
 
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+         getMenuInflater().inflate(R.menu.edit_record_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Splash/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_delete) {
+            showLovelyDialog(id, null);
+            Log.d("EditEnt", "Clicked");
+
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
 
+
+
+
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        saveStateHandler.saveInstanceState(outState);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedState) {
+        super.onRestoreInstanceState(savedState);
+        if (LovelySaveStateHandler.wasDialogOnScreen(savedState)) {
+            //Dialog won't be restarted automatically, so we need to call this method.
+            //Each dialog knows how to restore its state
+            showLovelyDialog(LovelySaveStateHandler.getSavedDialogId(savedState), savedState);
+        }
+    }
+
+
+
+
+    private void showStandardDialog(Bundle savedInstanceState) {
+        new LovelyStandardDialog(this, LovelyStandardDialog.ButtonLayout.HORIZONTAL)
+                .setTopColorRes( R.color.colorAccent)
+                .setButtonsColorRes(R.color.colorPrimaryDark)
+                .setIcon(R.drawable.ic_shocked)
+                .setTitle(R.string.delete_entry_warming)
+                .setInstanceStateHandler(ID_STANDARD_DIALOG, saveStateHandler)
+                .setSavedInstanceState(savedInstanceState)
+                .setMessage(R.string.delete_entry_msg)
+                .setPositiveButton(R.string.delete_ok, LovelyDialogCompat.wrap(new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                deleteEntry(mEditedEntry.getId());
+
+                                startActivity(new Intent(getApplicationContext(),Entries.class));
+                            }
+                        })
+
+                )
+                .setNegativeButton(R.string.delete_no,LovelyDialogCompat.wrap(new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                       // getDirections(mCurrentEstabliment.getLatitude(), mCurrentEstabliment.getLongitude());
+                    }
+                }))
+                .show();
+    }
+
+
+    private void showLovelyDialog(int dialogId, Bundle savedInstanceState) {
+        switch (dialogId) {
+            case ID_STANDARD_DIALOG:
+                showStandardDialog(savedInstanceState);
+                break;
+
+        }
+    }
 
 }

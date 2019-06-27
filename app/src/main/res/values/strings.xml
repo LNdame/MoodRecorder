@@ -49,4 +49,13 @@ perspective and to a certain extent streamline mental health services in
 
     <string name="toast_pick_file_error">Unable to pick file. Check status of file manager.</string>
 
+
+    <string name="delete_entry_warming">About to Delete Entry</string>
+
+    <string name="delete_entry_msg">Uh uh! You are about to delete this entry, this action is permanent and cannot be undone.</string>
+
+    <string name="delete_ok">Yes, delete</string>
+    <string name="delete_no">Oups! No</string>
+
+
 </resources>

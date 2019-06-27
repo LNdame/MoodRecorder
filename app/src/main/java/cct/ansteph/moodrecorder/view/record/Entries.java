@@ -190,7 +190,7 @@ public class Entries extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.entries, menu);
+       // getMenuInflater().inflate(R.menu.entries, menu);
         return true;
     }
 
@@ -226,7 +226,7 @@ public class Entries extends AppCompatActivity
         } else if (id == R.id.nav_calendar) {
             startActivity(new Intent(getApplicationContext(), CalendarView.class));
         } else if (id == R.id.nav_export) {
-
+            startActivity(new Intent(getApplicationContext(), Statistics.class));
         }else if (id == R.id.nav_about) {
             startActivity(new Intent(getApplicationContext(), About.class));
         }

@@ -312,7 +312,7 @@ public class RecordMood extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.record_mood, menu);
+       // getMenuInflater().inflate(R.menu.record_mood, menu);
         return true;
     }
 
@@ -349,7 +349,7 @@ public class RecordMood extends AppCompatActivity
         } else if (id == R.id.nav_calendar) {
             startActivity(new Intent(getApplicationContext(), CalendarView.class));
         } else if (id == R.id.nav_export) {
-            startActivity(new Intent(getApplicationContext(), ExportData.class));
+            startActivity(new Intent(getApplicationContext(), Statistics.class));
         }else if (id == R.id.nav_about) {
             startActivity(new Intent(getApplicationContext(), About.class));
         }
